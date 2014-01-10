@@ -15,7 +15,8 @@ setRefClass("NumClass",
             .self$num <- .self$num + 1
             return(.self$num)
             },
-        get = function() .self$num
+        get = function() .self$num,
+        zero = function() .self$num <- 0
         )
 )
 

@@ -12,18 +12,15 @@
     file <- arguments$args
 
     opt$Called_from_command_line <- TRUE
-    .printf("file is %s, class of opt is %s\n", file, class(opt))
     BiocCheck(file, opt)
 }
 
 BiocCheck <- function(package, ...)
 {
-    .printf("in BiocCheck()")
-    .printf("package is %s, args are:", package)
     dots = list(...)
-    print(dots)
 
     package_dir <- .get_package_dir(package)
+    checkVignetteDir(package_dir)
 }
 
 .get_package_dir <- function(pkgname)

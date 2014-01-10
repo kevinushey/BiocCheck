@@ -1,13 +1,13 @@
 .printf <- function(...) cat(noquote(sprintf(...)), "\n")
 
 .msg <- function(...) message(noquote(sprintf(...)))
-.stop <- function(...) stop(noquote(sprintf(...)))
+.stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 
 handleError <- function(msg)
 {
     num_errors$bump()
-    .stop("* ERROR: %s", msg)
+    .stop(msg)
 }
 
 handleWarning <- function(msg)
@@ -21,3 +21,4 @@ handleNote <- function(msg)
     num_notes$bump()
     sprintf("* NOTE: %s", msg)
 }
+
