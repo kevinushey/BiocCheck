@@ -31,3 +31,9 @@ checkVignetteDir <- function(pkgdir)
 
 
 }
+
+checkVersionNumber <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    version <- package_version(dcf[, "Version"])
+}
