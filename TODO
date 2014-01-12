@@ -1,4 +1,4 @@
-- biocViews
+X - biocViews
 - version number check
 - DESCRIPTION file constraints from build system, e.g., email address in Maintainer
 X vignettes/ not inst/doc/
