@@ -31,6 +31,7 @@ BiocCheck <- function(package, ...)
     checkBiocViews(package_dir)
 
     ## Summary
+    .msg("Summary:")
     .msg("Number of notes: %s", num_notes$get())
     .msg("Number of warnings: %s", num_warnings$get())
 
