@@ -22,11 +22,18 @@ BiocCheck <- function(package, ...)
         .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
 
-    # checks
+    ## checks
     handleMessage("Checking vignette directories...")
     checkVignetteDir(package_dir)
     handleMessage("Checking version number...")
     checkVersionNumber(package_dir)
+    handleMessage("Checking biocViews...")
+    checkBiocViews(package_dir)
+
+    ## Summary
+    .msg("Number of notes: %s", num_notes$get())
+    .msg("Number of warnings: %s", num_warnings$get())
+
 }
 
 .get_package_dir <- function(pkgname)

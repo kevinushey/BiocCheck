@@ -65,6 +65,7 @@ checkBiocViews <- function(pkgdir)
     } else {
         biocViews <- dcf[, "biocViews"]
         views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
+        library(biocViews)
         data(biocViewsVocab)
         if (!all(views %in% nodes(biocViewsVocab)))
         {

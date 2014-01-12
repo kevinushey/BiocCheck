@@ -16,7 +16,7 @@ setRefClass("NumClass",
             return(.self$num)
             },
         get = function() .self$num,
-        zero = function() .self$num <- 0
+        zero = function() .self$num <- 0L
         )
 )
 
@@ -28,3 +28,7 @@ check_notes <- new("MsgClass", name=character(0))
 num_errors <- new ("NumClass", num=integer(0))
 num_warnings <- new ("NumClass", num=integer(0))
 num_notes <- new ("NumClass", num=integer(0))
+
+num_errors$zero()
+num_warnings$zero()
+num_notes$zero()
