@@ -32,8 +32,26 @@ checkVignetteDir <- function(pkgdir)
 
 }
 
+
 checkVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    version <- package_version(dcf[, "Version"])
+    version <- dcf[, "Version"]
+    regex <- "^[0-9]+[-\\.]([0-9]+)[-\\.][0-9]+$"
+    if(!grepl(regex, version))
+        handleError("Invalid package Version")
+    tryCatch(pv <- package_version(version),
+        error=function(e) handleError("Invalid package version"))
+    y <- pv$minor
+    mod <- y %% 2
+    biocY <- packageVersion("BiocInstaller")$minor
+    bioc.mod <- biocY %% 2
+    isDevel <- (bioc.mod == 1)
+    if (mod != bioc.mod)
+    {
+        shouldBe <- ifelse(isDevel, "odd", "even")
+        vers <- ifelse(isDevel, "devel", "release")
+        handleWarning(sprintf("y of x.y.z version should be %s in %s",
+                shouldBe, vers))
+    }
 }

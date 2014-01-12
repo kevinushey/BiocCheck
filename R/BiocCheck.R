@@ -18,9 +18,13 @@
 BiocCheck <- function(package, ...)
 {
     dots = list(...)
-
+    if (length(package)==0)
+        .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
+
+    # checks
     checkVignetteDir(package_dir)
+    checkVersionNumber(package_dir)
 }
 
 .get_package_dir <- function(pkgname)
