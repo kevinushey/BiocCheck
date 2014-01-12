@@ -4,6 +4,11 @@
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 
+handleMessage <- function(msg)
+{
+    .msg("* %s", msg)
+}
+
 handleError <- function(msg)
 {
     num_errors$bump()

@@ -55,3 +55,24 @@ checkVersionNumber <- function(pkgdir)
                 shouldBe, vers))
     }
 }
+
+checkBiocViews <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if (!"biocViews" %in% colnames(dcf))
+    {
+        handleWarning("No biocViews found!")
+    } else {
+        biocViews <- dcf[, "biocViews"]
+        views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
+        data(biocViewsVocab)
+        if (!all(views %in% nodes(biocViewsVocab)))
+        {
+            handleWarning("Some biocViews are invalid")
+        }
+    }
+    # TODO - determine if this is a software,
+    # experiment data, or annotation package
+    # so we can make sure that the biocViews
+    # are under the right hierarchy
+}

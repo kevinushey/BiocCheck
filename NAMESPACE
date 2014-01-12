@@ -1,3 +1,4 @@
 import(optparse)
 export(BiocCheck)
 import(BiocInstaller)
+import(graph)

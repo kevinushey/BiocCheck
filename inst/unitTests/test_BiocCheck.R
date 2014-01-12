@@ -68,3 +68,17 @@ test_checkVersionNumber <- function()
 
 }
 
+test_checkBiocViews <- function()
+{
+    cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
+    checkTrue(BiocCheck:::num_warnings$get() == 1)
+    zeroCounters()
+    cat("biocViews: foo, bar,\n    baz", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
+    checkTrue(BiocCheck:::num_warnings$get() == 1)
+    cat("biocViews: Software, Cancer, BSgenome", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    zeroCounters()
+    BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
+    checkTrue(BiocCheck:::num_warnings$get() == 0)
+}

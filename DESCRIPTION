@@ -4,10 +4,10 @@ Description: Bioconductor-specific package checks
 Version: 0.99.0
 Authors@R: c(person("Bioconductor", "Package Maintainer", email="maintainer@bioconductor.org",
     role=c("aut", "cre")))
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.1.0), biocViews
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 Depends: optparse
-Imports: biocViews, BiocInstaller
+Imports: biocViews, BiocInstaller, biocViews, graph
 Suggests: knitr, RUnit, BiocGenerics

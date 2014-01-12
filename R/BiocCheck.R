@@ -23,7 +23,9 @@ BiocCheck <- function(package, ...)
     package_dir <- .get_package_dir(package)
 
     # checks
+    handleMessage("Checking vignette directories...")
     checkVignetteDir(package_dir)
+    handleMessage("Checking version number...")
     checkVersionNumber(package_dir)
 }
 
