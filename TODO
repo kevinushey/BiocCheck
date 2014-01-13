@@ -16,3 +16,5 @@ X vignettes/ not inst/doc/
 - devtools? codetoolsBioC?
 - using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
 - satisfy build system (python) requirements for well-formatted maintainer lines, etc.
+- ??check that tarball name is well formatted, i.e. that it matches what's in the DESCRIPTION file for
+Version: and Package:?? Not sure if R CMD check already does this.

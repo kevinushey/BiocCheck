@@ -29,6 +29,8 @@ BiocCheck <- function(package, ...)
     checkVersionNumber(package_dir)
     handleMessage("Checking biocViews...")
     checkBiocViews(package_dir)
+    handleMessage("Checking build system compatibility...")
+    checkBBScompatibility(package_dir)
 
     ## Summary
     .msg("Summary:")
@@ -52,8 +54,8 @@ BiocCheck <- function(package, ...)
             pkgname))
     }
 
+    expectedPackageName <- strsplit(basename(pkgname), "_")[[1]][1]
     t = tempdir()
-    res = untar(pkgname, exdir=t)
-    
-
+    untar(pkgname, exdir=t)
+    file.path(t, expectedPackageName)
 }

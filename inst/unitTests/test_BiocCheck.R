@@ -47,6 +47,12 @@ test_vignettes0 <- function()
     checkTrue(BiocCheck:::num_errors$get() == 0 
         && BiocCheck:::num_warnings$get() == 1 
         && BiocCheck:::num_notes$get() == 0)
+    zeroCounters()
+    unlink(instdoc, TRUE)
+    dir.create(instdoc, recursive=TRUE)
+    cat("nothing", file=file.path(instdoc, "test.Rmd"))
+    checkException(checkVignetteDir(UNIT_TEST_TEMPDIR),
+        "Rmd file not seen as valid vignette source")
 }
 
 test_checkVersionNumber <- function()

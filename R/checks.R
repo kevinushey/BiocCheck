@@ -8,7 +8,7 @@ setRefClass("MsgClass",
 getVigSources <- function(dir)
 {
     dir(dir,
-        pattern=glob2rx(c("*.Rnw", "*.Rmd", "*.Rrst")),
+        pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$",
         ignore.case=TRUE)
 }
 
@@ -94,4 +94,9 @@ checkBiocViews <- function(pkgdir)
         handleWarning(paste("Including biocViews from more than one category",
             "(Software, ExperimentData, AnnotationData)"))
     }
+}
+
+checkBBScompatibility <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
 }
