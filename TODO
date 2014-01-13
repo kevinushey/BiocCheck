@@ -18,3 +18,4 @@ X vignettes/ not inst/doc/
 - satisfy build system (python) requirements for well-formatted maintainer lines, etc.
 - ??check that tarball name is well formatted, i.e. that it matches what's in the DESCRIPTION file for
 Version: and Package:?? Not sure if R CMD check already does this.
+- Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
