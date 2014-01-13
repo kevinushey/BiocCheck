@@ -69,11 +69,29 @@ checkBiocViews <- function(pkgdir)
         data(biocViewsVocab)
         if (!all(views %in% nodes(biocViewsVocab)))
         {
-            handleWarning("Some biocViews are invalid")
+            badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
+                collapse=", ")
+            handleWarning(paste("Some biocViews are invalid:",
+                badViews))
         }
     }
-    # TODO - determine if this is a software,
-    # experiment data, or annotation package
-    # so we can make sure that the biocViews
-    # are under the right hierarchy
+
+    getParent <- function(view)
+    {
+        topLevel <- c("Software", "ExperimentData", "AnnotationData")
+        for (level in topLevel) {
+            if (view %in% names(acc(biocViewsVocab, level)[[level]]))
+                return(level)
+        }
+    }
+    parents <- c()
+    for (view in views)
+    {
+        parents <- c(parents, getParent(view))
+    }
+    if (length(unique(parents)) > 1)
+    {
+        handleWarning(paste("Including biocViews from more than one category",
+            "(Software, ExperimentData, AnnotationData)"))
+    }
 }
