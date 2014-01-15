@@ -1,10 +1,20 @@
-UNIT_TEST_TEMPDIR <- file.path(tempdir(), "unitTestTempDir")
+UNIT_TEST_PKG <- "unitTestTempDir"
+UNIT_TEST_TEMPDIR <- file.path(tempdir(), UNIT_TEST_PKG)
+
+message("You may see some warnings here -- they don't indicate unit test problems.")
 
 zeroCounters <- function()
 {
     BiocCheck:::num_notes$zero()
     BiocCheck:::num_warnings$zero()
     BiocCheck:::num_errors$zero()
+}
+
+stillZero <- function()
+{
+    BiocCheck:::num_notes$get() == 0 &&
+    BiocCheck:::num_warnings$get() == 0 &&
+    BiocCheck:::num_errors$get() == 0
 }
 
 .setUp <- function()
@@ -95,4 +105,49 @@ test_checkBiocViews <- function()
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::num_warnings$get() == 1,
         "biocViews from multiple categories don't produce warning")
+}
+
+test_checkBBScompatibility <- function()
+{
+    cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Package name which doesn't match dir name does not cause exception!")
+    cat(sprintf("Package: ", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Missing Version doesn't throw exception!")
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: syntax error", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Syntax error in Authors@R doesn't throw exception!")
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1 + 1", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Wrong class in Authors@R doesn't throw exception!")
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Missing cre role in Authors@R doesn't throw exception!")
+    cat(sprintf("Package: %s\nVersion: 0.99.0", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Missing Maintainer and Authors@R doesn't throw exception!")
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow",
+        UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
+        "Missing email in Maintainer doesn't throw exception!")
+    zeroCounters()
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
+        UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+    zeroCounters()
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
+        UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+
 }

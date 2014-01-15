@@ -62,6 +62,7 @@ checkBiocViews <- function(pkgdir)
     if (!"biocViews" %in% colnames(dcf))
     {
         handleWarning("No biocViews found!")
+        return()
     } else {
         biocViews <- dcf[, "biocViews"]
         views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
@@ -99,6 +100,16 @@ checkBiocViews <- function(pkgdir)
 checkBBScompatibility <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
+    pkgNameFromDir <- segs[length(segs)]
+    if (dcf[, "Package"] != pkgNameFromDir)
+        handleError(sprintf(
+            "Package dir %s does not match Package: field %s!"),
+            pkgNameFromDir, dcf[, "Package"])
+
+    if (!"Version" %in% colnames(dcf))
+        handleError("Version field not found in DESCRIPTION!")
+
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -106,9 +117,11 @@ checkBBScompatibility <- function(pkgdir)
         env[["c"]] = c
         env[["person"]] <- person
         pp <- parse(text=dcf[,"Authors@R"]) 
-        tryCatch(people <- as.character(eval(pp, env)),
+        tryCatch(people <- eval(pp, env),
             error=function(e)
-                handleError("Failed to evaluate Authors@R field!")
+                handleError("Failed to evaluate Authors@R field!"))
+        if (!"person" %in% class(people))
+            handleError("Authors@R does not evaluate to 'person' object!")
         for (person in people)
         {
             if ("cre" %in% person$role)
@@ -138,5 +151,11 @@ checkBBScompatibility <- function(pkgdir)
         .handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
     }
     # now need to make sure that regexes work, a la python/BBS 
-
+    regex = '(.*\\S)\\s*<(.*)>\\s*'
+    match <- regexec(regex, maintainer)[[1]]
+    match.length <- attr(match, "match.length")
+    if (!  (all(match)  > 0) && (all(match.length) > 0) )
+    {
+        handleError("Couldn't get email address from Maintainer field.")
+    }
 }
