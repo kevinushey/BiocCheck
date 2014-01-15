@@ -31,6 +31,8 @@ BiocCheck <- function(package, ...)
     checkBiocViews(package_dir)
     handleMessage("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
+    handleMessage("Checking unit tests...")
+    checkUnitTests(package_dir)
 
     ## Summary
     .msg("Summary:")

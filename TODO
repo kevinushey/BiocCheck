@@ -1,6 +1,6 @@
 X - biocViews
 X- version number check
-- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
+X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
 X vignettes/ not inst/doc/
 - examples in man page
 - dontrun / eval=FALSE
@@ -11,7 +11,7 @@ X vignettes/ not inst/doc/
 - print() cat() message() warning() error() (mis)use?
 - library() in man pages
 - code formatting stats / constats
-- if () '%' vs '%%'
+- if () '%' vs '%%' # & vs &&, | vs || ?
 - NAMESPACE and DESCRIPTION file consistency
 - devtools? codetoolsBioC?
 - using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)

@@ -24,6 +24,6 @@ handleWarning <- function(msg)
 handleNote <- function(msg)
 {
     num_notes$bump()
-    sprintf("* NOTE: %s", msg)
+    .msg(sprintf("* NOTE: %s", msg))
 }
 

@@ -151,3 +151,15 @@ test_checkBBScompatibility <- function()
     checkTrue(stillZero())
 
 }
+
+test_checkUnitTests <- function()
+{
+    BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
+    checkTrue(BiocCheck:::num_notes$get() == 1)
+    dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"))
+    cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "tests",
+        "foo.R"))
+    zeroCounters()
+    BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+}

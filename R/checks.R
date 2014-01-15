@@ -159,3 +159,25 @@ checkBBScompatibility <- function(pkgdir)
         handleError("Couldn't get email address from Maintainer field.")
     }
 }
+
+## This could maybe be more comprehensive, but
+## it's what R CMD check does to decide whether
+## to run tests.
+## OOPS - R CMD check is looking at the INSTALLED directory
+checkUnitTests <- function(pkgdir)
+{   
+    ## begin code stolen from tools:::.check_packages
+    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) & 
+        isdir
+    ## ...
+    tests_dir <- file.path(pkgdir, "tests")
+    if (!(dir.exists(tests_dir) && length(dir(tests_dir, pattern = "\\.(R|Rin)$"))))
+    ## end stolen code
+    {
+        msg <- paste0("Looks like this package contains no unit tests.\n",
+            "  We strongly recommend them. See\n",
+            "  http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/."
+            )
+        handleNote(msg)
+    }
+}
