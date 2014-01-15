@@ -137,6 +137,6 @@ checkBBScompatibility <- function(pkgdir)
     } else {
         .handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
     }
-    # now need to make sure that regexes work, a la python/BBS
+    # now need to make sure that regexes work, a la python/BBS 
 
 }
