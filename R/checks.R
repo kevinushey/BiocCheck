@@ -99,4 +99,44 @@ checkBiocViews <- function(pkgdir)
 checkBBScompatibility <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    maintainer <- NULL
+    if ("Authors@R" %in% colnames(dcf))
+    {
+        env <- new.env(parent=emptyenv())
+        env[["c"]] = c
+        env[["person"]] <- person
+        pp <- parse(text=dcf[,"Authors@R"]) 
+        tryCatch(people <- as.character(eval(pp, env)),
+            error=function(e)
+                handleError("Failed to evaluate Authors@R field!")
+        for (person in people)
+        {
+            if ("cre" %in% person$role)
+            {
+                email <- person$email
+                if (is.null(email))
+                    return(NULL)
+                given <- paste(person$given, collapse=" ")
+                if (is.null(given))
+                    given <- ""
+                family <- paste(person$family, collapse=" ")
+                if (is.null(family))
+                    family <- ""
+                if (given == "" && family == "")
+                    return(NULL)
+                res <- sprintf("%s %s <%s>", given, family, email)
+                res <- sub("^ +", "", res)
+                maintainer <- res
+                break
+            }
+        }
+        if (is.null(maintainer))
+            handleError("No author with maintainer (cre) role.")
+    } else if ("Maintainer" %in% colnames(dcf)) {
+        maintainer <- dcf[,"Maintainer"]
+    } else {
+        .handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
+    }
+    # now need to make sure that regexes work, a la python/BBS
+
 }
