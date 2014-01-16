@@ -62,6 +62,14 @@ yihui -formatR dependency on net connection (css and js files)
 make sure we are warn = 1 to report warnings when they happen (a la R CMD check)
 
 
+how to find occurences of T and F in code:
+p <- parse("file.R")
+the code
+then
+df <- getParseData(p)
+tfs <- df[which(df$token == "SYMBOL" & df$text %in%  c("T", "F")),]
+hasTF <- dim(tfs)[1] > 0
+
 new todos 1/15/14
 
 
