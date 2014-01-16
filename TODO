@@ -37,7 +37,79 @@ X- unit tests
     warning
 
 - using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
-- ??check that tarball name is well formatted, i.e. that it matches what's in the DESCRIPTION file for
-Version: and Package:?? Not sure if R CMD check already does this.
-- Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
-- do vignettes, man pages, and anything else (?) contain non-ascii/accented characters?
+    would be nice - 
+    rapply(body)
+    codetools
+    - Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
+
+misc notes
+
+Required - like error, but check continues, BUT it returns an error code,
+  nothing propagates 
+    biocViews
+Recommended - like warning 
+Note - neutral
+
+Is error necessary?
+
+add new flag --new-package,
+    then check that version is 0.99.z if that switch is on
+
+tools::Rdindex
+
+yihui -formatR dependency on net connection (css and js files)
+
+make sure we are warn = 1 to report warnings when they happen (a la R CMD check)
+
+
+new todos 1/15/14
+
+
+
+*** TODO start BiocCheck
+**** Required (errors) [1/1]
+- [X] biocViews - present - valid - consistent hierarhcy
+- [2/3] version number check
+   - [X] valid version
+   - [X] appropriate for devel or release
+   - [ ] new packages: 0[-.]99[-.][0-9]+
+- [3/3] DESCRIPTION
+   - [X] Version: field
+   - [X] Maintainer: field
+   - [X] email parsed from maintainer field
+- [0/2] Vignette
+   - [ ] vignette directory
+   - [ ] vignette sources (Rnw, Rmd, Rrst)
+- [/] man
+   - [ ] runnable examples on pages with exported functions / methods
+- Cross-platform availability
+**** Recommended (warnings)
+- [ ] NAMESPACE and DESCRIPTION file inconsistency
+       all(names(getNamespaceImports("Rsamtools")) %in% loadedNamespaces())
+       all(unmangled(packageDescription("Rsamtools")$Imports) %in% 
+getNamespaceImports("Rsamtools"))
+- [0/1] vignette
+   - [ ] % eval=FALSE chunks
+- [0/1] inst/doc
+   - [ ] vignette sources (Rnw, Rmd, Rrst)
+- [0/1] man
+   - [ ] % dontrun
+- [0/1] tests
+   - [ ] non-empty tests/ directory
+- [0/2] R/
+   - [ ] OS-specific packages / code ?
+   - [ ] Don't use T / F
+- [ ] NEWS
+       - present in ./ or ./inst
+       - well-formatted?
+- [ ] registration of .Call entry points
+   - pkg in getLoadedDLLS() but no getDLLRegistredRoutines()
+- [ ] library(MyPackage) / require() in man pages
+- print() cat() message() warning() error() (mis)use?
+**** Other? (note)
+- [ ] use of .C
+- [ ] \seealso{} (times used; more is better)
+- [ ] Code formatting stats / consistency
+- [ ] warnings reported to user
+- [ ] codetoolsBioC::writeNamespaceExports()
+- devtools? formatR?
