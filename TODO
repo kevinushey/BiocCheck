@@ -2,20 +2,41 @@ X - biocViews
 X- version number check
 X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
 X vignettes/ not inst/doc/
-- examples in man page
+- examples in man page 
+    every man page which documents an exported function
+    must have an example (required)
 - dontrun / eval=FALSE
-- unit tests
+    warnings - note percent 
+X- unit tests
+- deprecated packages
+    multicore
 - detect OS-specific code?
 - registration of .Call entry points
+    getLoadedDLLs() - is there one?
+    getDLLRegisteredRoutines() if it returns nothing
+    warning
+- use of .C is a note
 - \seealso{} ?
+    NOTE: count # of times it's used
 - print() cat() message() warning() error() (mis)use?
-- library() in man pages
+- library(pkg) in man pages
+    warning
 - code formatting stats / constats
+    indentation, line length NOTE
+    formatR / tidy?
 - if () '%' vs '%%' # & vs &&, | vs || ?
 - NAMESPACE and DESCRIPTION file consistency
+    warning getNamespaceImports
+    loadedNamespaces()
+    all 
 - devtools? codetoolsBioC?
+    NOTE: writeNamespaceExports try/catch
+- NEWS file
+    missing?
+    well-formatted?
+    warning
+
 - using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
-- satisfy build system (python) requirements for well-formatted maintainer lines, etc.
 - ??check that tarball name is well formatted, i.e. that it matches what's in the DESCRIPTION file for
 Version: and Package:?? Not sure if R CMD check already does this.
 - Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
