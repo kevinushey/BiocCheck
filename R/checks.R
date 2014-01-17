@@ -181,3 +181,18 @@ checkUnitTests <- function(pkgdir)
         handleNote(msg)
     }
 }
+
+checkRegistrationOfEntryPoints <- function(pkgname)
+{
+    d <- getLoadedDLLs()
+    if (pkgname %in% names(d))
+    {
+        r <- getDLLRegisteredRoutines(pkgname)
+        # FIXME What's a better way to determine that there's nothing in r?
+        # This is stupid and may fail in other locales.
+        if (capture.output(r) == "data frame with 0 columns and 0 rows")
+        {
+            handleWarning("Package has a DLL but no registered routines!")
+        }
+    }
+}

@@ -3,6 +3,7 @@
 .BiocCheckFromCommandLine <- function()
 {
     option_list <- list(
+        make_option("--no-check-vignettes", action="store_false")
 #        make_option(c("-n", "--add_numbers"), action="store_true", default=FALSE,
 #        help="Print line number at the beginning of each line [default]")
         )
@@ -17,17 +18,27 @@
 
 BiocCheck <- function(package, ...)
 {
-    dots = list(...)
+    d <- list(...)
+    if (length(d))
+        dots <- list(...)[[1]]
+    else
+        dots <- list()
+
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
+    package_name <- .get_package_name(package)
 
     handleMessage("Installing package...")
     installAndLoad(package)
 
+
     ## checks
-    handleMessage("Checking vignette directories...")
-    checkVignetteDir(package_dir)
+    if (is.null(dots[["no-check-vignettes"]]))
+    {
+        handleMessage("Checking vignette directories...")
+        checkVignetteDir(package_dir)
+    }
     handleMessage("Checking version number...")
     checkVersionNumber(package_dir)
     handleMessage("Checking biocViews...")
@@ -36,12 +47,18 @@ BiocCheck <- function(package, ...)
     checkBBScompatibility(package_dir)
     handleMessage("Checking unit tests...")
     checkUnitTests(package_dir)
-
+    handleMessage("Checking native routine registration...")
+    checkRegistrationOfEntryPoints(package_name)
     ## Summary
     .msg("Summary:")
     .msg("Number of notes: %s", num_notes$get())
     .msg("Number of warnings: %s", num_warnings$get())
 
+}
+
+.get_package_name <- function(input)
+{
+    strsplit(basename(input), "_")[[1]][1]
 }
 
 .get_package_dir <- function(pkgname)

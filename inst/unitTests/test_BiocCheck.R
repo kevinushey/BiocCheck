@@ -187,3 +187,16 @@ test_installAndLoad <- function()
     checkTrue("package:testpkg" %in% search(),
         "testpkg is not installed!")
 }
+
+test_checkRegistrationOfEntryPoints <- function()
+{
+    if(!require(Biobase)) suppressPackageStartupMessages(require("Biobase"))
+    zeroCounters()
+    BiocCheck:::checkRegistrationOfEntryPoints("Biobase")
+    checkTrue(stillZero())
+    zeroCounters()
+    # This test could fail if devtools registers routines:
+    if(!require(devtools)) suppressPackageStartupMessages(require("devtools"))
+    BiocCheck:::checkRegistrationOfEntryPoints("devtools")
+    checkTrue(BiocCheck:::num_warnings$get() == 1)
+}
