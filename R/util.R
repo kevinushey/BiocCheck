@@ -45,3 +45,23 @@ installAndLoad <- function(pkg)
     args <- list(package=pkgname, lib.loc=libdir)
     suppressPackageStartupMessages(do.call(library, args))
 }
+
+cleanupDependency <- function(input)
+{
+    output <- gsub("\\s", "", input)
+    output <- gsub("\\([^)]*\\)", "", output)
+    strsplit(output, ",")[[1]]
+}
+
+getAllDependencies <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    fields <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")
+    out <- c()
+    for (field in fields)
+    {   
+        if (field %in% colnames(dcf))
+            out <- append(out, cleanupDependency(dcf[, field]))
+    }
+    out
+}

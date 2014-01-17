@@ -57,6 +57,8 @@ BiocCheck <- function(package, ...)
     checkUnitTests(package_dir)
     handleMessage("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name)
+    handleMessage("Checking for namespace import suggestions...")
+    checkImportSuggestions(package_name)
     ## Summary
     .msg("Summary:")
     .msg("Number of notes: %s", num_notes$get())

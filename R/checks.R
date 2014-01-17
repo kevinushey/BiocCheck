@@ -206,3 +206,22 @@ checkRegistrationOfEntryPoints <- function(pkgname)
         }
     }
 }
+
+checkImportSuggestions <- function(pkgname)
+{
+    suggestions <- NULL
+    tryCatch({
+        suppressMessages({
+            suggestions <- capture.output(writeNamespaceImports(pkgname))
+        })
+    },
+        error=function(e){
+            handleMessage("Could not get namespace suggestions.")
+            })
+    if(!is.null(suggestions))
+    {
+            handleMessage("Namespace import suggestions are:")
+            cat(paste(suggestions, collapse="\n"))
+            handleMessage("--END of namespace import suggestions.")
+    }
+}
