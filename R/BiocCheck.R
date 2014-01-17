@@ -3,7 +3,10 @@
 .BiocCheckFromCommandLine <- function()
 {
     option_list <- list(
-        make_option("--no-check-vignettes", action="store_false")
+        make_option("--no-check-vignettes", action="store_false",
+            help="disable vignette checks"),
+        make_option("--new-package", action="store_false",
+            help="enable checks specific to new packages")
 #        make_option(c("-n", "--add_numbers"), action="store_true", default=FALSE,
 #        help="Print line number at the beginning of each line [default]")
         )
@@ -40,7 +43,12 @@ BiocCheck <- function(package, ...)
         checkVignetteDir(package_dir)
     }
     handleMessage("Checking version number...")
-    checkVersionNumber(package_dir)
+    if (!is.null(dots[["new-package"]]))
+    {
+        handleMessage("Checking new package version number...")
+        checkNewPackageVersionNumber(package_dir)
+    }
+    checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
     handleMessage("Checking biocViews...")
     checkBiocViews(package_dir)
     handleMessage("Checking build system compatibility...")

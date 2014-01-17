@@ -98,7 +98,17 @@ test_checkVersionNumber <- function()
     }
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::num_warnings$get() ==1)
+}
 
+test_checkNewPackageVersionNumber <- function()
+{
+    setVersion("1.2.3")
+    checkException(checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR),
+        "new package with wrong version number didn't throw error!")
+    zeroCounters()
+    setVersion("0.99.1")
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
 }
 
 test_checkBiocViews <- function()

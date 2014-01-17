@@ -32,8 +32,17 @@ checkVignetteDir <- function(pkgdir)
 
 }
 
+checkNewPackageVersionNumber <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    version <- dcf[, "Version"]
+        if(!grepl("^0[-.]99[-.][0-9]+$", version))
+            handleError(sprintf
+                ("Version %s is wrong for new package; should start with 0.99.",version))
 
-checkVersionNumber <- function(pkgdir)
+}
+
+checkVersionNumber <- function(pkgdir, new_package=FALSE)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
