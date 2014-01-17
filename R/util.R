@@ -30,9 +30,17 @@ handleNote <- function(msg)
 installAndLoad <- function(pkg)
 {
     libdir <- file.path(tempdir(), "lib")
-    dir.create(libdir)
-    capture.output(suppressMessages(install.packages(pkg, libdir,
-        repos=NULL, type="source", INSTALL_opts="--no-test-load")))
+    dir.create(libdir, showWarnings=FALSE)
+    stderr <- file.path(tempdir(), "install.stderr")
+    res <- system2(file.path(Sys.getenv("R_HOME"), "bin", "R"),
+        sprintf("CMD INSTALL --no-test-load --library=%s %s", libdir, pkg),
+        stdout=NULL, stderr=stderr)
+    if (res != 0) 
+    {
+        cat(paste(readLines(stderr), collapse="\n"))
+        handleError(sprintf("Failed to install %s!", pkg))
+
+    }
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
     suppressPackageStartupMessages(do.call(library, args))

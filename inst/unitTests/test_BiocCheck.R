@@ -4,7 +4,8 @@ UNIT_TEST_TEMPDIR <- file.path(tempdir(), UNIT_TEST_PKG)
 message("You may see some warnings here -- they don't indicate unit test problems.")
 
 
-create_test_package <- function(pkgpath, description=list())
+create_test_package <- function(pkgpath, description=list(),
+    extraActions=function(){})
 {
     canned <- list(Author="Test Author", 
         Maintainer="Test Maintainer <test@test.com>", "Authors@R"=NULL)
@@ -15,6 +16,7 @@ create_test_package <- function(pkgpath, description=list())
     path <- file.path(tempdir(), pkgpath)
     suppressMessages(create(path, canned))
     cat("#", file=file.path(path, "NAMESPACE"))
+    extraActions()
     path
 }
 
