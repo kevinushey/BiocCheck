@@ -3,6 +3,21 @@ UNIT_TEST_TEMPDIR <- file.path(tempdir(), UNIT_TEST_PKG)
 
 message("You may see some warnings here -- they don't indicate unit test problems.")
 
+
+create_test_package <- function(pkgpath, description=list())
+{
+    canned <- list(Author="Test Author", 
+        Maintainer="Test Maintainer <test@test.com>", "Authors@R"=NULL)
+    for (name in names(description))
+    {
+        canned[[name]] <- description[[name]]
+    }
+    path <- file.path(tempdir(), pkgpath)
+    suppressMessages(create(path, canned))
+    cat("#", file=file.path(path, "NAMESPACE"))
+    path
+}
+
 zeroCounters <- function()
 {
     BiocCheck:::num_notes$zero()
@@ -162,4 +177,11 @@ test_checkUnitTests <- function()
     zeroCounters()
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
+}
+
+test_installAndLoad <- function()
+{
+    BiocCheck:::installAndLoad(create_test_package('testpkg'))
+    checkTrue("package:testpkg" %in% search(),
+        "testpkg is not installed!")
 }

@@ -9,5 +9,5 @@ License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 Depends: optparse
-Imports: biocViews, BiocInstaller, biocViews, graph
+Imports: biocViews, BiocInstaller, biocViews, graph, devtools
 Suggests: knitr, RUnit, BiocGenerics

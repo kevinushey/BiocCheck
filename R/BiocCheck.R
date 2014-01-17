@@ -22,6 +22,9 @@ BiocCheck <- function(package, ...)
         .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
 
+    handleMessage("Installing package...")
+    installAndLoad(package)
+
     ## checks
     handleMessage("Checking vignette directories...")
     checkVignetteDir(package_dir)
