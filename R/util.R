@@ -12,7 +12,7 @@ handleMessage <- function(msg)
 handleError <- function(msg)
 {
     .errors$add(msg)
-    .stop(msg)
+    #.stop(msg)
 }
 
 handleWarning <- function(msg)

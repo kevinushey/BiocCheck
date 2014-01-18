@@ -17,11 +17,15 @@ checkVignetteDir <- function(pkgdir)
     vigdir <- file.path(pkgdir, "vignettes")
     instdocdir <- file.path(pkgdir, "inst", "doc")
     if (!file.exists(vigdir))
+    {
         handleError("No 'vignettes' directory!")
+        return()
+    }
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
     {
         handleError("No vignette sources in vignettes/ directory.")
+        return()
     }
     instdocdircontents <- getVigSources(instdocdir)
     if (length(instdocdircontents) > 0)
@@ -48,21 +52,27 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
     version <- dcf[, "Version"]
     regex <- "^[0-9]+[-\\.]([0-9]+)[-\\.][0-9]+$"
     if(!grepl(regex, version))
-        handleError("Invalid package Version")
-    tryCatch(pv <- package_version(version),
-        error=function(e) handleError("Invalid package version"))
-    y <- pv$minor
-    mod <- y %% 2
-    biocY <- packageVersion("BiocInstaller")$minor
-    bioc.mod <- biocY %% 2
-    isDevel <- (bioc.mod == 1)
-    if (mod != bioc.mod)
     {
-        shouldBe <- ifelse(isDevel, "odd", "even")
-        vers <- ifelse(isDevel, "devel", "release")
-        handleWarning(sprintf("y of x.y.z version should be %s in %s",
-                shouldBe, vers))
+        handleError("Invalid package Version")
+        return()
     }
+    tryCatch({
+        pv <- package_version(version)
+        y <- pv$minor
+        mod <- y %% 2
+        biocY <- packageVersion("BiocInstaller")$minor
+        bioc.mod <- biocY %% 2
+        isDevel <- (bioc.mod == 1)
+        if (mod != bioc.mod)
+        {
+            shouldBe <- ifelse(isDevel, "odd", "even")
+            vers <- ifelse(isDevel, "devel", "release")
+            handleWarning(sprintf("y of x.y.z version should be %s in %s",
+                    shouldBe, vers))
+        }
+
+        },
+        error=function(e) handleError("Invalid package version"))
 }
 
 checkBiocViews <- function(pkgdir)
@@ -112,13 +122,17 @@ checkBBScompatibility <- function(pkgdir)
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
     if (dcf[, "Package"] != pkgNameFromDir)
+    {
         handleError(sprintf(
-            "Package dir %s does not match Package: field %s!"),
-            pkgNameFromDir, dcf[, "Package"])
-
+            "Package dir %s does not match Package: field %s!",
+            pkgNameFromDir, dcf[, "Package"]))
+            return()
+    }
     if (!"Version" %in% colnames(dcf))
+    {
         handleError("Version field not found in DESCRIPTION!")
-
+        return()
+    }
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -127,10 +141,15 @@ checkBBScompatibility <- function(pkgdir)
         env[["person"]] <- person
         pp <- parse(text=dcf[,"Authors@R"]) 
         tryCatch(people <- eval(pp, env),
-            error=function(e)
-                handleError("Failed to evaluate Authors@R field!"))
+            error=function(e) {
+                handleError("Failed to evaluate Authors@R field!")
+            })
+        if (!exists("people")) return()
         if (!"person" %in% class(people))
+        {
             handleError("Authors@R does not evaluate to 'person' object!")
+            return()
+        }
         for (person in people)
         {
             if ("cre" %in% person$role)
@@ -153,19 +172,25 @@ checkBBScompatibility <- function(pkgdir)
             }
         }
         if (is.null(maintainer))
+        {
             handleError("No author with maintainer (cre) role.")
+            return()
+        }
     } else if ("Maintainer" %in% colnames(dcf)) {
         maintainer <- dcf[,"Maintainer"]
     } else {
-        .handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
+        handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
+        return()
     }
     # now need to make sure that regexes work, a la python/BBS 
     regex = '(.*\\S)\\s*<(.*)>\\s*'
     match <- regexec(regex, maintainer)[[1]]
     match.length <- attr(match, "match.length")
-    if (!  (all(match)  > 0) && (all(match.length) > 0) )
+    #if (!  (all(match)  > 0) && (all(match.length) > 0) )
+    if (match == -1 && match.length == -1)
     {
         handleError("Couldn't get email address from Maintainer field.")
+        return()
     }
 }
 

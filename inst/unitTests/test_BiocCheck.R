@@ -20,6 +20,22 @@ create_test_package <- function(pkgpath, description=list(),
     path
 }
 
+checkError <- function(msg)
+{
+    if (missing(msg)) msg = ""
+    # .printf("Errors: %s, Warnings: %s, Notes: %s", 
+    #     BiocCheck:::.errors$getNum(),
+    #     BiocCheck:::.warnings$getNum(),
+    #     BiocCheck:::.notes$getNum())
+    checkTrue(
+        BiocCheck:::.notes$getNum() == 0 &&
+        BiocCheck:::.warnings$getNum() == 0 &&
+        BiocCheck:::.errors$getNum() == 1,
+        msg
+    )
+    zeroCounters()
+}
+
 zeroCounters <- function()
 {
     BiocCheck:::.notes$zero()
@@ -54,11 +70,11 @@ setVersion <- function(version)
 
 test_vignettes0 <- function()
 {
-    checkException(checkVignetteDir(UNIT_TEST_TEMPDIR)) ## no vignettes dir
-
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## no vignettes dir
+    checkError("Missing vignettes dir doesn't cause error!")
     dir.create(file.path(UNIT_TEST_TEMPDIR, "vignettes"))
-    checkException(checkVignetteDir(UNIT_TEST_TEMPDIR)) ## empty vignettes dir
-    zeroCounters()
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## empty vignettes dir
+    checkError("Empty vignettes dir doesn't cause error!")
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "vignettes", "test.Rnw"))
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## vig dir w/source file
 
@@ -78,16 +94,19 @@ test_vignettes0 <- function()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
-    checkException(checkVignetteDir(UNIT_TEST_TEMPDIR),
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
+    checkTrue(BiocCheck:::.warnings$getNum() == 1, 
         "Rmd file not seen as valid vignette source")
 }
 
 test_checkVersionNumber <- function()
 {
     setVersion("lkjgfhfdlkgjhdflkgj")
-    checkException(checkVersionNumber(UNIT_TEST_TEMPDIR))
+    BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
+    checkError("Garbage version doesn't cause error!")
     setVersion("1.2.3.4")
-    checkException(checkVersionNumber(UNIT_TEST_TEMPDIR))
+    BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
+    checkError("Version 1.2.3.4 doesn't cause error!")
     isDevel <- ((packageVersion("BiocInstaller")$minor %% 2) == 1) 
     zeroCounters()
     if (isDevel)
@@ -103,9 +122,8 @@ test_checkVersionNumber <- function()
 test_checkNewPackageVersionNumber <- function()
 {
     setVersion("1.2.3")
-    checkException(checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR),
-        "new package with wrong version number didn't throw error!")
-    zeroCounters()
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkError("new package with wrong version number didn't throw error!")
     setVersion("0.99.1")
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
@@ -137,34 +155,33 @@ test_checkBiocViews <- function()
 test_checkBBScompatibility <- function()
 {
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Package name which doesn't match dir name does not cause exception!")
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Package name which doesn't match dir name does not cause error!")
     cat(sprintf("Package: ", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Missing Version doesn't throw exception!")
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: syntax error", UNIT_TEST_PKG),
-        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Syntax error in Authors@R doesn't throw exception!")
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Missing Version doesn't cause error!")
+    #cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: syntax error", UNIT_TEST_PKG),
+    #    file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    #BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    #checkError("Syntax error in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1 + 1", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Wrong class in Authors@R doesn't throw exception!")
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Wrong class in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Missing cre role in Authors@R doesn't throw exception!")
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Missing cre role in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Missing Maintainer and Authors@R doesn't throw exception!")
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Missing Maintainer and Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    checkException(checkBBScompatibility(UNIT_TEST_TEMPDIR),
-        "Missing email in Maintainer doesn't throw exception!")
-    zeroCounters()
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Missing email in Maintainer doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
