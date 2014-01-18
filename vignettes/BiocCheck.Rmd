@@ -9,12 +9,12 @@
 core team feels are best practices for writing Bioconductor packages.
 We've divided our opinions into three categories:
 
-* **Required** (Equivalent to an ERROR in `R CMD check`). This means the package
+* **Required** (Equivalent to an `ERROR` in `R CMD check`). This means the package
   is missing something critical and it cannot be accepted into Bioconductor
   until the issue is fixed. (`BiocCheck` will continue past a `required`
   error, thus it is possible to have more than one, but it will end
   with an error code.)
-* **Recommended** (Equivalent to a WARNING in `R CMD check`). We strongly
+* **Recommended** (Equivalent to a `WARNING` in `R CMD check`). We strongly
   encourage that these issues be fixed. In the weeks leading up to a
   Bioconductor release we will ask package authors to fix these issues.
 * **Note**: Not necessarily something bad, just something we wanted to point out.
@@ -39,7 +39,7 @@ suppressWarnings(
 cat(paste(output, collapse="\n"))
 ```
 
-# Installing BiocCheck
+# Installing `BiocCheck`
 
 
 

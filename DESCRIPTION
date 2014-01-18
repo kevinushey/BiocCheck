@@ -11,3 +11,4 @@ VignetteBuilder: knitr
 Depends: optparse
 Imports: biocViews, BiocInstaller, biocViews, graph, devtools, codetoolsBioC
 Suggests: knitr, RUnit, BiocGenerics, Biobase
+Enhances: codetoolsBioC
