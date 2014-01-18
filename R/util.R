@@ -12,13 +12,14 @@ handleMessage <- function(msg)
 handleError <- function(msg)
 {
     .errors$add(msg)
+    .msg("REQUIRED: %s", msg)
     #.stop(msg)
 }
 
 handleWarning <- function(msg)
 {
     .warnings$add(msg)
-    .msg("* WARNING: %s", msg)
+    .msg("* RECOMMENDED: %s", msg)
 }
 
 handleNote <- function(msg)
