@@ -11,19 +11,19 @@ handleMessage <- function(msg)
 
 handleError <- function(msg)
 {
-    num_errors$bump()
+    .errors$add(msg)
     .stop(msg)
 }
 
 handleWarning <- function(msg)
 {
-    num_warnings$bump()
+    .warnings$add(msg)
     .msg("* WARNING: %s", msg)
 }
 
 handleNote <- function(msg)
 {
-    num_notes$bump()
+    .notes$add(msg)
     .msg(sprintf("* NOTE: %s", msg))
 }
 

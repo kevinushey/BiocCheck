@@ -39,6 +39,10 @@ suppressWarnings(
 cat(paste(output, collapse="\n"))
 ```
 
+# When should `BiocCheck` be run
+
+Run `BiocCheck` after running `R CMD check`. 
+
 # Installing `BiocCheck`
 
 

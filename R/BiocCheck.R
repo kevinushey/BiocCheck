@@ -3,14 +3,12 @@
 .BiocCheckFromCommandLine <- function()
 {
     option_list <- list(
-        make_option("--no-check-vignettes", action="store_false",
+        make_option("--no-check-vignettes", action="store_true",
             help="disable vignette checks"),
-        make_option("--new-package", action="store_false",
+        make_option("--new-package", action="store_true",
             help="enable checks specific to new packages")
-#        make_option(c("-n", "--add_numbers"), action="store_true", default=FALSE,
-#        help="Print line number at the beginning of each line [default]")
         )
-    parser <- OptionParser(usage = "%prog [options] package", option_list=option_list)
+    parser <- OptionParser(usage = "R CMD BiocCheck [options] package", option_list=option_list)
     arguments <- parse_args(parser, positional_arguments = 1)
     opt <- arguments$options
     file <- arguments$args
@@ -32,6 +30,9 @@ BiocCheck <- function(package, ...)
     package_dir <- .get_package_dir(package)
     package_name <- .get_package_name(package)
 
+
+    handleMessage(sprintf("This is BiocCheck version %s.",
+        packageVersion("BiocCheck")))
     handleMessage("Installing package...")
     installAndLoad(package)
 
@@ -64,8 +65,8 @@ BiocCheck <- function(package, ...)
     }
     ## Summary
     .msg("Summary:")
-    .msg("Number of notes: %s", num_notes$get())
-    .msg("Number of warnings: %s", num_warnings$get())
+    .msg("Number of notes: %s", .notes$get())
+    .msg("Number of warnings: %s", .warnings$get())
 
 }
 

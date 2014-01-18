@@ -22,16 +22,16 @@ create_test_package <- function(pkgpath, description=list(),
 
 zeroCounters <- function()
 {
-    BiocCheck:::num_notes$zero()
-    BiocCheck:::num_warnings$zero()
-    BiocCheck:::num_errors$zero()
+    BiocCheck:::.notes$zero()
+    BiocCheck:::.warnings$zero()
+    BiocCheck:::.errors$zero()
 }
 
 stillZero <- function()
 {
-    BiocCheck:::num_notes$get() == 0 &&
-    BiocCheck:::num_warnings$get() == 0 &&
-    BiocCheck:::num_errors$get() == 0
+    BiocCheck:::.notes$getNum() == 0 &&
+    BiocCheck:::.warnings$getNum() == 0 &&
+    BiocCheck:::.errors$getNum() == 0
 }
 
 .setUp <- function()
@@ -62,18 +62,18 @@ test_vignettes0 <- function()
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "vignettes", "test.Rnw"))
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## vig dir w/source file
 
-    checkTrue(BiocCheck:::num_errors$get() == 0 
-        && BiocCheck:::num_warnings$get() == 0 
-        && BiocCheck:::num_notes$get() == 0)
+    checkTrue(BiocCheck:::.errors$getNum() == 0 
+        && BiocCheck:::.warnings$getNum() == 0 
+        && BiocCheck:::.notes$getNum() == 0)
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.rnw"))
     zeroCounters()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_errors$get() == 0 
-        && BiocCheck:::num_warnings$get() == 1 
-        && BiocCheck:::num_notes$get() == 0)
+    checkTrue(BiocCheck:::.errors$getNum() == 0 
+        && BiocCheck:::.warnings$getNum() == 1 
+        && BiocCheck:::.notes$getNum() == 0)
     zeroCounters()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
@@ -97,7 +97,7 @@ test_checkVersionNumber <- function()
         setVersion("1.3.3")
     }
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_warnings$get() ==1)
+    checkTrue(BiocCheck:::.warnings$getNum() ==1)
 }
 
 test_checkNewPackageVersionNumber <- function()
@@ -115,22 +115,22 @@ test_checkBiocViews <- function()
 {
     cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_warnings$get() == 1,
+    checkTrue(BiocCheck:::.warnings$getNum() == 1,
         "missing biocViews doesn't produce warning")
     zeroCounters()
     cat("biocViews: foo, Cancer, bar,\n    baz", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_warnings$get() == 1,
+    checkTrue(BiocCheck:::.warnings$getNum() == 1,
         "invalid biocViews don't produce warning")
     cat("biocViews: GO, CellBasedAssays", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     zeroCounters()
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_warnings$get() == 0,
+    checkTrue(BiocCheck:::.warnings$getNum() == 0,
         "valid biocViews produce warning")
     zeroCounters()
     cat("biocViews: aCGH, ChipName", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_warnings$get() == 1,
+    checkTrue(BiocCheck:::.warnings$getNum() == 1,
         "biocViews from multiple categories don't produce warning")
 }
 
@@ -182,7 +182,7 @@ test_checkBBScompatibility <- function()
 test_checkUnitTests <- function()
 {
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
-    checkTrue(BiocCheck:::num_notes$get() == 1)
+    checkTrue(BiocCheck:::.notes$getNum() == 1)
     dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"))
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "tests",
         "foo.R"))
@@ -208,5 +208,5 @@ test_checkRegistrationOfEntryPoints <- function()
     # This test could fail if devtools registers routines:
     if(!require(devtools)) suppressPackageStartupMessages(require("devtools"))
     BiocCheck:::checkRegistrationOfEntryPoints("devtools")
-    checkTrue(BiocCheck:::num_warnings$get() == 1)
+    checkTrue(BiocCheck:::.warnings$getNum() == 1)
 }
