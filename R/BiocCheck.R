@@ -68,6 +68,15 @@ BiocCheck <- function(package, ...)
     .msg("Number of notes: %s", .notes$get())
     .msg("Number of warnings: %s", .warnings$get())
 
+    if (Called_from_command_line)
+    {
+        Sys.exit(1)
+    } else {
+        return list(errors=.errors$get(),
+            warnings=.warnings$get(),
+            notes=.notes$get())
+    }
+
 }
 
 .get_package_name <- function(input)
