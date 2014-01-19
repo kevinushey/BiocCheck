@@ -244,3 +244,11 @@ test_parseFile <- function()
     df <- BiocCheck:::parseFile(testFile, "BiocCHeck")
     checkTrue(all(dim(df) == c(6,9)))
 }
+
+test_checkParsedFiles <- function()
+{
+    BiocCheck:::checkParsedFiles(getwd())
+    BiocCheck:::checkParsedFiles(system.file("testpackages",
+        "devtools0", package="BiocCheck"))
+    
+}

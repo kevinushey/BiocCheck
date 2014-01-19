@@ -67,7 +67,8 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for deprecated package usage....")
     checkDeprecatedPackages(package_dir)
 
-    
+    handleMessage("Parsing R code in R directory, examples, vignettes...")
+    checkParsedFiles(package_dir)
 
     ## Summary
     .msg("Summary:")

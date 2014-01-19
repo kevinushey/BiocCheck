@@ -260,3 +260,58 @@ checkDeprecatedPackages <- function(pkgdir)
     }
 }
 
+checkParsedFiles <- function(pkgdir)
+{
+    handleLoop <- function(loop)
+    {
+        for (item in loop)
+        {
+            message(item, appendLF=TRUE)
+            message(" ", appendLF=TRUE)
+        }
+        message("")
+    }
+
+    t <- c()
+    f <- c()
+    dotc <- c()
+    callbacks <- list(
+        # check for T or F
+        function(df, filename) {
+            trows <- df[which(df$token == "SYMBOL" & df$text =="T"),]
+            frows <- df[which(df$token == "SYMBOL" & df$text =="F"),]
+            hasT <- dim(trows)[1] > 0
+            hasF <- dim(frows)[1] > 0 
+            if (hasT) t <- append(t, filename)
+            if (hasF) f <- append(f, filename)
+        },
+        # check for .C
+        function(df, filename)
+        {
+            dotcrows <- df[which(df$token == "SYMBOL_FUNCTION_CALL" & df$text ==".C"),]
+            hasdotc <- dim(dotcrows)[1] > 0
+            if (hasdotc) dotc <- append(dotc, filename)
+        }
+    )
+    parseFiles(pkgdir, callbacks)
+    if (length(t))
+    {
+        handleWarning("Symbol T found (use TRUE instead) in files:")
+        message("* ", appendLF=FALSE)
+        handleLoop(t)
+    }
+    if (length(f))
+    {
+        handleWarning("Symbol F found (use FALSE instead) in files:")
+        message("* ", appendLF=FALSE)
+        handleLoop(t)
+    }
+    if (length(dotc))
+    {
+        handleMessage(".C found in files:")
+        message("* ", appendLF=FALSE)
+        handleLoop(dotc)
+    }
+
+
+}

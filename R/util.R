@@ -75,7 +75,9 @@ parseFile <- function(infile, pkgdir)
         if ("VignetteBuilder" %in% colnames(dcf))
         {
             outfile <- file.path(tempdir(), "parseFile.tmp")
-            purl(infile, outfile, documentation=0L)
+            suppressMessages(capture.output(
+                purl(infile, outfile, documentation=0L)
+            ))
         } else {
             oldwd <- getwd()
             on.exit(setwd(oldwd))
@@ -87,11 +89,30 @@ parseFile <- function(infile, pkgdir)
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
-        code <- Rd2ex(rd)
+        capture.output(code <- Rd2ex(rd))
         cat(code, file=outfile)
     } else if (grepl("\\.R", infile, TRUE)) {
         outfile <- infile
     }
     p <- parse(outfile)
     getParseData(p)
+}
+
+parseFiles <- function(pkgdir, callbacks)
+{
+    dir1 <- dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
+        full.names=TRUE)
+    dir2 <- dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
+        full.names=TRUE)
+    dir3 <- dir(file.path(pkgdir, "vignettes"),
+        pattern="\\.Rnw$|\\.Rmd$|\\.Rrst", ignore.case=TRUE, full.names=TRUE)
+    files <- c(dir1, dir2, dir3)
+    for (file in files)
+    {
+        df <- parseFile(file, pkgdir)
+        for (callback in callbacks)
+        {
+            do.call(callback, list(df, file))
+        }
+    }
 }
