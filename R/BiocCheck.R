@@ -58,7 +58,7 @@ BiocCheck <- function(package, ...)
     checkUnitTests(package_dir)
     handleMessage("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name)
-    if (require(codetoolsBioC))
+    if (suppressMessages(require(codetoolsBioC)))
     {
         handleMessage("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
@@ -67,14 +67,20 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for deprecated package usage....")
     checkDeprecatedPackages(package_dir)
 
+    
+
     ## Summary
     .msg("Summary:")
-    .msg("Number of notes: %s", .notes$get())
-    .msg("Number of warnings: %s", .warnings$get())
+    .msg("REQUIRED count: %s", .errors$getNum())
+    .msg("RECOMMENDED count: %s", .warnings$getNum())
+    .msg("NOTE count: %s", .notes$getNum())
 
-    if (Called_from_command_line)
+    if (.errors$getNum() > 0)
+        .msg("BiocCheck FAILED.")
+
+    if ("Called_from_command_line" %in% names(dots))
     {
-        Sys.exit(1)
+        q("no", 1)
     } else {
         return (list(errors=.errors$get(),
             warnings=.warnings$get(),

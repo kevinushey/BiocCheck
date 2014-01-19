@@ -12,7 +12,7 @@ handleMessage <- function(msg)
 handleError <- function(msg)
 {
     .errors$add(msg)
-    .msg("REQUIRED: %s", msg)
+    .msg("* REQUIRED: %s", msg)
     #.stop(msg)
 }
 
@@ -65,4 +65,33 @@ getAllDependencies <- function(pkgdir)
             out <- append(out, cleanupDependency(dcf[, field]))
     }
     out
+}
+
+parseFile <- function(infile, pkgdir)
+{
+    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst", infile, TRUE))
+    {
+        dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+        if ("VignetteBuilder" %in% colnames(dcf))
+        {
+            outfile <- file.path(tempdir(), "parseFile.tmp")
+            purl(infile, outfile, documentation=0L)
+        } else {
+            oldwd <- getwd()
+            on.exit(setwd(oldwd))
+            setwd(tempdir())
+            outfile <- file.path(tempdir(), sub("\\.Rnw$", ".R", TRUE), basename(infile))
+            Stangle(infile)
+        }
+    } else if (grepl("\\.Rd", infile, TRUE)) 
+    {
+        rd <- parse_Rd(infile)
+        outfile <- file.path(tempdir(), "parseFile.tmp")
+        code <- Rd2ex(rd)
+        cat(code, file=outfile)
+    } else if (grepl("\\.R", infile, TRUE)) {
+        outfile <- infile
+    }
+    p <- parse(outfile)
+    getParseData(p)
 }

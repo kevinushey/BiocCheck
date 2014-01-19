@@ -236,3 +236,11 @@ test_checkDeprecatedPackages <- function()
     checkError("Depending on multicore didn't cause error!")
    
 }
+
+test_parseFile <- function()
+{
+    testFile <- file.path(tempdir(), "testfile.R")
+    cat("1 + 1", file=testFile)
+    df <- BiocCheck:::parseFile(testFile, "BiocCHeck")
+    checkTrue(all(dim(df) == c(6,9)))
+}

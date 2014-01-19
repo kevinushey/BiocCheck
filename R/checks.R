@@ -259,3 +259,4 @@ checkDeprecatedPackages <- function(pkgdir)
             "Windows. Use 'parallel' instead."))
     }
 }
+
