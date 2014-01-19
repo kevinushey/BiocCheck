@@ -227,3 +227,12 @@ test_checkRegistrationOfEntryPoints <- function()
     BiocCheck:::checkRegistrationOfEntryPoints("devtools")
     checkTrue(BiocCheck:::.warnings$getNum() == 1)
 }
+
+test_checkDeprecatedPackages <- function()
+{
+     cat(sprintf("Depends: multicore", UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkDeprecatedPackages(UNIT_TEST_TEMPDIR)
+    checkError("Depending on multicore didn't cause error!")
+   
+}

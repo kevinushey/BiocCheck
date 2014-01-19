@@ -63,6 +63,10 @@ BiocCheck <- function(package, ...)
         handleMessage("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
     }
+
+    handleMessage("Checking for deprecated package usage....")
+    checkDeprecatedPackages(package_dir)
+
     ## Summary
     .msg("Summary:")
     .msg("Number of notes: %s", .notes$get())
@@ -72,9 +76,9 @@ BiocCheck <- function(package, ...)
     {
         Sys.exit(1)
     } else {
-        return list(errors=.errors$get(),
+        return (list(errors=.errors$get(),
             warnings=.warnings$get(),
-            notes=.notes$get())
+            notes=.notes$get()))
     }
 
 }

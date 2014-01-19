@@ -250,3 +250,12 @@ checkImportSuggestions <- function(pkgname)
             handleMessage("--END of namespace import suggestions.")
     }
 }
+
+checkDeprecatedPackages <- function(pkgdir)
+{
+    if ("multicore" %in% getAllDependencies(pkgdir))
+    {
+        handleError(paste("'multicore' is deprecated and does not work on",
+            "Windows. Use 'parallel' instead."))
+    }
+}
