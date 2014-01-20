@@ -58,7 +58,7 @@ BiocCheck <- function(package, ...)
     checkUnitTests(package_dir)
     handleMessage("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name)
-    if (suppressMessages(require(codetoolsBioC)))
+    if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
     {
         handleMessage("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
@@ -75,6 +75,9 @@ BiocCheck <- function(package, ...)
     checkTorF(parsedCode)
     handleMessage("Checking for .C...")
     checkForDotC(parsedCode, package_name)
+
+    handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
+    checkDescriptionNamespaceConsistency(package_name)
 
     ## Summary
     .msg("Summary:")

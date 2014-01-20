@@ -1,8 +1,3 @@
-setRefClass("MsgClass",
-    fields=list(
-        name="character"
-    )
-)
 
 
 getVigSources <- function(dir)
@@ -139,7 +134,7 @@ checkBBScompatibility <- function(pkgdir)
         env <- new.env(parent=emptyenv())
         env[["c"]] = c
         env[["person"]] <- person
-        pp <- parse(text=dcf[,"Authors@R"]) 
+        pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE) 
         tryCatch(people <- eval(pp, env),
             error=function(e) {
                 handleError("Failed to evaluate Authors@R field!")
@@ -369,6 +364,31 @@ checkParsedFiles <- function(pkgdir)
         message("* ", appendLF=FALSE)
         handleLoop(dotc)
     }
+}
 
+checkDescriptionNamespaceConsistency <- function(pkgname)
+{
+#     if (!all(names(getNamespaceImports(pkgname)) %in% loadedNamespaces()))
+#    {
+#        handleWarning("Not all packages imported in NAMESPACE are in Description:Imports") #??
+#        # FIXME be specific
+#    }
+    dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
+    nImports <- names(getNamespaceImports(pkgname))
+    nImports <- nImports[which(nImports != "base")]
 
+    if(!(all(dImports %in% nImports)))
+    {
+        badones <- dImports[!dImports %in% nImports]
+        handleWarning(sprintf("%s imported in DESCRIPTION but not NAMESPACE",
+            paste(badones, collapse=", ")))
+    }
+    if (!all (nImports %in% dImports))
+    {
+        badones <- nImports[!nImports %in% dImports]
+        handleWarning(sprintf(
+            "%s imported in NAMESPACE but not in DESCRIPTION:Imports",
+            paste(badones, collapse=", ")))
+
+    }
 }

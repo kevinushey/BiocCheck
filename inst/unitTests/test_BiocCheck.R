@@ -3,9 +3,10 @@ UNIT_TEST_TEMPDIR <- file.path(tempdir(), UNIT_TEST_PKG)
 
 message("You may see some warnings here -- they don't indicate unit test problems.")
 
+library(devtools)
 
 create_test_package <- function(pkgpath, description=list(),
-    extraActions=function(){})
+    extraActions=function(path=NULL){})
 {
     canned <- list(Author="Test Author", 
         Maintainer="Test Maintainer <test@test.com>", "Authors@R"=NULL)
@@ -14,9 +15,10 @@ create_test_package <- function(pkgpath, description=list(),
         canned[[name]] <- description[[name]]
     }
     path <- file.path(tempdir(), pkgpath)
+    unlink(path, recursive=TRUE)
     suppressMessages(create(path, canned))
     cat("#", file=file.path(path, "NAMESPACE"))
-    extraActions()
+    extraActions(path)
     path
 }
 
@@ -247,6 +249,7 @@ test_parseFile <- function()
 
 test_checkTorF <- function() 
 {
+    DEACTIVATED("not ready yet")
     parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
         "devtools0", package="BiocCheck"))
     res <- BiocCheck:::checkTorF(parsedCode)
@@ -262,4 +265,33 @@ test_checkForDotC <- function()
     res <- BiocCheck:::checkForDotC(parsedCode, "devtools0")
     checkTrue(length(res) == 1)
     res
+}
+
+test_checkDescriptionNamespaceConsistency <- function()
+{
+    testpkg <- 'testpkg'
+
+    zeroCounters()
+
+    pkgpath <- create_test_package(testpkg, list(Imports="devtools"))
+    BiocCheck:::installAndLoad(pkgpath)
+    BiocCheck:::checkDescriptionNamespaceConsistency(testpkg)
+    checkTrue(BiocCheck:::.warnings$getNum() == 1)
+    checkEquals("devtools imported in DESCRIPTION but not NAMESPACE",
+        BiocCheck:::.warnings$get()[1])
+
+    zeroCounters()
+
+    pkgpath <- create_test_package(testpkg, extraActions=function(path){
+        cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
+    })
+    BiocCheck:::installAndLoad(pkgpath)
+
+    checkTrue("devtools" %in% names(getNamespaceImports(testpkg)))
+
+    BiocCheck:::checkDescriptionNamespaceConsistency(testpkg)
+    checkTrue(BiocCheck:::.warnings$getNum() == 1)
+    checkEquals("devtools imported in NAMESPACE but not in DESCRIPTION:Imports",
+        BiocCheck:::.warnings$get()[1])
+
 }

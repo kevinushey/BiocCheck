@@ -1,4 +1,3 @@
-
 setRefClass("MsgClass",
     fields=list(
         msg="character"
@@ -11,9 +10,6 @@ setRefClass("MsgClass",
         )
 )
 
-
-
-.errors <- new ("MsgClass", msg=character(0))
-.warnings <- new ("MsgClass", msg=character(0))
-.notes <- new ("MsgClass", msg=character(0))
-
+.errors <- new("MsgClass", msg=character(0))
+.warnings <- new("MsgClass", msg=character(0))
+.notes <- new("MsgClass", msg=character(0))
