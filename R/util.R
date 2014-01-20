@@ -92,14 +92,16 @@ parseFile <- function(infile, pkgdir)
         capture.output(code <- Rd2ex(rd))
         cat(code, file=outfile)
     } else if (grepl("\\.R", infile, TRUE)) {
+        #message(sprintf("infile is %s", infile))
         outfile <- infile
     }
     p <- parse(outfile)
     getParseData(p)
 }
 
-parseFiles <- function(pkgdir, callbacks)
+parseFiles <- function(pkgdir)
 {
+    parsedCode <- list()
     dir1 <- dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
         full.names=TRUE)
     dir2 <- dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
@@ -110,9 +112,7 @@ parseFiles <- function(pkgdir, callbacks)
     for (file in files)
     {
         df <- parseFile(file, pkgdir)
-        for (callback in callbacks)
-        {
-            do.call(callback, list(df, file))
-        }
+        parsedCode[[file]] <- df
     }
+    parsedCode
 }

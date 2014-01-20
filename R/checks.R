@@ -260,6 +260,63 @@ checkDeprecatedPackages <- function(pkgdir)
     }
 }
 
+
+checkTorF <- function(parsedCode)
+{
+    t <- list()
+    f <- c()
+    for (filename in names(parsedCode))
+    {
+        df <- parsedCode[[filename]]
+        trows <- df[which(df$token == "SYMBOL" & df$text =="T"),]
+        frows <- df[which(df$token == "SYMBOL" & df$text =="F"),]
+        if (nrow(trows) > 0) 
+        hasT <- dim(trows)[1] > 0
+        hasF <- dim(frows)[1] > 0 
+        if (hasT) t <- append(t, filename)
+        if (hasF) f <- append(f, filename)
+
+    }
+    #FIXME - print output
+    list(t=t, f=f) # for tests
+}
+
+
+mungeName <- function(name, pkgname) # FIXME test on windows!
+{
+    pos <- regexpr(pkgname, name)
+    substr(name, pos+1+nchar(pkgname), nchar(name))
+}
+
+
+checkForDotC <- function(parsedCode, pkgname)
+{
+    dotc <- list()
+    for (filename in names(parsedCode))
+    {
+        df <- parsedCode[[filename]]
+        dotcrows <- df[which(df$token == "SYMBOL_FUNCTION_CALL" & df$text ==".C"),]
+        if (nrow(dotcrows) > 0)
+        {
+            dotc[[filename]] <- dotcrows[, c(1,2)]
+        }
+    }
+    for (name in names(dotc))
+    {
+        x <- dotc[[name]]
+        for (i in nrow(x))
+        {
+            if (grepl("\\.R$", name, ignore.case=TRUE))
+                message(sprintf("Found .C in %s (line %s, column %s)",
+                    mungeName(name, pkgname), x[i,1], x[i,2]))
+            else
+                message(sprintf("Found .C in %s", name)) # FIXME test this
+
+        }
+    }
+    dotc # for tests
+}
+
 checkParsedFiles <- function(pkgdir)
 {
     handleLoop <- function(loop)

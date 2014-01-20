@@ -31,7 +31,7 @@ BiocCheck <- function(package, ...)
     package_name <- .get_package_name(package)
 
 
-    handleMessage(sprintf("This is BiocCheck version %s.",
+    handleMessage(sprintf("This is BiocCheck, version %s.",
         packageVersion("BiocCheck")))
     handleMessage("Installing package...")
     installAndLoad(package)
@@ -68,7 +68,13 @@ BiocCheck <- function(package, ...)
     checkDeprecatedPackages(package_dir)
 
     handleMessage("Parsing R code in R directory, examples, vignettes...")
-    checkParsedFiles(package_dir)
+
+    parsedCode <- parseFiles(package_dir)
+
+    handleMessage("Checking for T and F symbols...")
+    checkTorF(parsedCode)
+    handleMessage("Checking for .C...")
+    checkForDotC(parsedCode, package_name)
 
     ## Summary
     .msg("Summary:")

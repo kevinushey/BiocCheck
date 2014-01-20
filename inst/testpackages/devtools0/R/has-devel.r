@@ -20,6 +20,8 @@ has_devel <- function() {
   dll <- dyn.load(dylib)
   on.exit(dyn.unload(dylib), add = TRUE)
 
+  stopifnot(.C(dll$bar, 0L)[[1]] == 1L)
+
   stopifnot(.C(dll$foo, 0L)[[1]] == 1L)
   TRUE
 }

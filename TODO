@@ -80,14 +80,14 @@ new todos 1/15/14
 - [2/3] version number check
    - [X] valid version
    - [X] appropriate for devel or release
-   - [ ] new packages: 0[-.]99[-.][0-9]+
+   - [X] new packages: 0[-.]99[-.][0-9]+
 - [3/3] DESCRIPTION
    - [X] Version: field
    - [X] Maintainer: field
    - [X] email parsed from maintainer field
 - [0/2] Vignette
-   - [ ] vignette directory
-   - [ ] vignette sources (Rnw, Rmd, Rrst)
+   - [X] vignette directory
+   - [X] vignette sources (Rnw, Rmd, Rrst)
 - [/] man
    - [ ] runnable examples on pages with exported functions / methods
 - Cross-platform availability

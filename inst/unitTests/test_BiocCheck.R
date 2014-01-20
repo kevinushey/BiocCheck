@@ -245,10 +245,21 @@ test_parseFile <- function()
     checkTrue(all(dim(df) == c(6,9)))
 }
 
-test_checkParsedFiles <- function()
+test_checkTorF <- function() 
 {
-    BiocCheck:::checkParsedFiles(getwd())
-    BiocCheck:::checkParsedFiles(system.file("testpackages",
+    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
         "devtools0", package="BiocCheck"))
-    
+    res <- BiocCheck:::checkTorF(parsedCode)
+    checkTrue(length(res$t) == 1)
+    checkTrue(length(res$f) == 1)
+
+}
+
+test_checkForDotC <- function()
+{
+    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+        "devtools0", package="BiocCheck"))
+    res <- BiocCheck:::checkForDotC(parsedCode, "devtools0")
+    checkTrue(length(res) == 1)
+    res
 }
