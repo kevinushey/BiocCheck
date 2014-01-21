@@ -103,7 +103,7 @@ getNamespaceImports("Rsamtools"))
 - [0/1] man
    - [ ] % dontrun
 - [0/1] tests
-   - [ ] non-empty tests/ directory
+   - [X] non-empty tests/ directory
 - [0/2] R/
    - [ ] OS-specific packages / code ?
    - [ ] Don't use T / F

@@ -277,7 +277,7 @@ checkTorF <- function(parsedCode)
 }
 
 
-mungeName <- function(name, pkgname) # FIXME test on windows!
+mungeName <- function(name, pkgname)
 {
     pos <- regexpr(pkgname, name)
     substr(name, pos+1+nchar(pkgname), nchar(name))
