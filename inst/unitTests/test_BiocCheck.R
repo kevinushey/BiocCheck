@@ -251,7 +251,7 @@ test_checkTorF <- function()
 {
     DEACTIVATED("not ready yet")
     parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "devtools0", package="BiocCheck"))
+        "testpkg0", package="BiocCheck"))
     res <- BiocCheck:::checkTorF(parsedCode)
     checkTrue(length(res$t) == 1)
     checkTrue(length(res$f) == 1)
@@ -261,9 +261,9 @@ test_checkTorF <- function()
 test_checkForDotC <- function()
 {
     parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "devtools0", package="BiocCheck"))
-    res <- BiocCheck:::checkForDotC(parsedCode, "devtools0")
-    checkTrue(length(res) == 1)
+        "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::checkForDotC(parsedCode, "testpkg0")
+    checkTrue(length(res) == 2)
     res
 }
 

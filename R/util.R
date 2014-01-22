@@ -95,8 +95,8 @@ parseFile <- function(infile, pkgdir)
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
-        capture.output(code <- Rd2ex(rd))
-        cat(code, file=outfile)
+        code <- capture.output(Rd2ex(rd))
+        cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R", infile, TRUE)) {
         #message(sprintf("infile is %s", infile))
         outfile <- infile

@@ -3,6 +3,13 @@ Suggestions from Nate:
 - Make sure every (non-trivial) class has a show() method.
    or at least display the #/% of classes that don't.
 
+---
+more ideas from dan:
+
+- search for browser() statements
+- search for more than one (e.g.) examples section in man page?
+  (subsequent ones are not checked by R CMD check)
+
 X - biocViews
 X- version number check
 X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
