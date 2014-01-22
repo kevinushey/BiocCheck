@@ -1,3 +1,8 @@
+Suggestions from Nate:
+- Valid license
+- Make sure every (non-trivial) class has a show() method.
+   or at least display the #/% of classes that don't.
+
 X - biocViews
 X- version number check
 X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
