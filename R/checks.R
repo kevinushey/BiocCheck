@@ -236,14 +236,25 @@ checkImportSuggestions <- function(pkgname)
         })
     },
         error=function(e){
+            suggestions <- "ERROR"
             handleMessage("Could not get namespace suggestions.")
-            })
-    if(!is.null(suggestions))
+    })
+
+
+    if(length(suggestions) && (!is.null(suggestions)) &&
+        (suggestions != "ERROR"))
     {
             handleMessage("Namespace import suggestions are:")
-            cat(paste(suggestions, collapse="\n"))
+            message(paste(suggestions, collapse="\n"))
             handleMessage("--END of namespace import suggestions.")
     }
+
+    if ((!is.null(suggestions)) && (!length(suggestions)))
+    {
+        message("No suggestions.")
+    }
+
+    suggestions
 }
 
 checkDeprecatedPackages <- function(pkgdir)
@@ -277,40 +288,6 @@ checkTorF <- function(parsedCode)
 }
 
 
-mungeName <- function(name, pkgname)
-{
-    pos <- regexpr(pkgname, name)
-    substr(name, pos+1+nchar(pkgname), nchar(name))
-}
-
-
-checkForDotC <- function(parsedCode, pkgname)
-{
-    dotc <- list()
-    for (filename in names(parsedCode))
-    {
-        df <- parsedCode[[filename]]
-        dotcrows <- df[which(df$token == "SYMBOL_FUNCTION_CALL" & df$text ==".C"),]
-        if (nrow(dotcrows) > 0)
-        {
-            dotc[[filename]] <- dotcrows[, c(1,2)]
-        }
-    }
-    for (name in names(dotc))
-    {
-        x <- dotc[[name]]
-        for (i in nrow(x))
-        {
-            if (grepl("\\.R$", name, ignore.case=TRUE))
-                message(sprintf("Found .C in %s (line %s, column %s)",
-                    mungeName(name, pkgname), x[i,1], x[i,2]))
-            else
-                message(sprintf("Found .C in %s", name)) # FIXME test this
-
-        }
-    }
-    dotc # for tests
-}
 
 checkParsedFiles <- function(pkgdir)
 {

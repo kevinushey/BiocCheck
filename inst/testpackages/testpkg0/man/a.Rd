@@ -57,9 +57,6 @@ function (x)
   }
 }
 
-\examples{
-# 2nd example section
-}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

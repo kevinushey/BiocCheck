@@ -71,10 +71,18 @@ BiocCheck <- function(package, ...)
 
     parsedCode <- parseFiles(package_dir)
 
-    handleMessage("Checking for T and F symbols...")
-    checkTorF(parsedCode)
-    handleMessage("Checking for .C...")
-    checkForDotC(parsedCode, package_name)
+    # FIXME - reactivate
+    #handleMessage("Checking for T and F symbols...")
+    #checkTorF(parsedCode)
+    handleMessage("Checking for .C()...")
+    res <- findFunctionCall(parsedCode, package_name, ".C")
+    if (res > 0) handleNote(sprintf(".C() was found in %s files",
+        res))
+    handleMessage("Checking for browser()...")
+    res <- findFunctionCall(parsedCode, package_name, "browser")
+    if (res > 0)
+        handleWarning(sprintf("browser() was found in %s files",
+            res))
 
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)

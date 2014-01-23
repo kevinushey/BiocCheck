@@ -98,10 +98,9 @@ parseFile <- function(infile, pkgdir)
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R", infile, TRUE)) {
-        #message(sprintf("infile is %s", infile))
         outfile <- infile
     }
-    p <- parse(outfile)
+    p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
 }
 
@@ -122,3 +121,45 @@ parseFiles <- function(pkgdir)
     }
     parsedCode
 }
+
+findFunctionCall <- function(parsedCode, pkgname, functionName,
+    resultFunction)
+{
+    matches <- list()
+    for (filename in names(parsedCode))
+    {
+        df <- parsedCode[[filename]]
+        matchedrows <- 
+            df[which(df$token == 
+                "SYMBOL_FUNCTION_CALL" & df$text == functionName),]
+        if (nrow(matchedrows) > 0)
+        {
+            matches[[filename]] <- matchedrows[, c(1,2)]
+        }
+    }
+    for (name in names(matches))
+    {
+        x <- matches[[name]]
+        for (i in nrow(x))
+        {
+            if (grepl("\\.R$", name, ignore.case=TRUE))
+                message(sprintf("  Found %s() in %s (line %s, column %s)",
+                    functionName, mungeName(name, pkgname), x[i,1], x[i,2]))
+            else
+                message(sprintf("  Found %s() in %s",
+                    functionName, mungeName(name, pkgname))) # FIXME test this
+
+        }
+    }
+    length(matches) # for tests
+}
+
+mungeName <- function(name, pkgname)
+{
+    twoseps <- paste0(rep.int(.Platform$file.sep, 2), collapse="")
+    name <- gsub(twoseps, .Platform$file.sep, name, fixed=TRUE)
+    pos <- regexpr(pkgname, name)
+    substr(name, pos+1+nchar(pkgname), nchar(name))
+}
+
+

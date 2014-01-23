@@ -17,7 +17,7 @@ Thanks to the suggestion of Simon Urbanek.
   cat("void foo(int *bar) { *bar=1; }\n", file = foo_path)
   on.exit(unlink(foo_path))
 
-  R("CMD SHLIB foo.c", tempdir())
+  devtools:::R("CMD SHLIB foo.c", tempdir())
   dylib <- file.path(tempdir(), paste("foo", .Platform$dynlib.ext, sep=''))
   on.exit(unlink(dylib), add = TRUE)
 

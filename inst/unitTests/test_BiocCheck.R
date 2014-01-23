@@ -5,6 +5,8 @@ message("You may see some warnings here -- they don't indicate unit test problem
 
 library(devtools)
 
+parsedCode <- NULL
+
 create_test_package <- function(pkgpath, description=list(),
     extraActions=function(path=NULL){})
 {
@@ -250,8 +252,9 @@ test_parseFile <- function()
 test_checkTorF <- function() 
 {
     DEACTIVATED("not ready yet")
-    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "testpkg0", package="BiocCheck"))
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
     res <- BiocCheck:::checkTorF(parsedCode)
     checkTrue(length(res$t) == 1)
     checkTrue(length(res$f) == 1)
@@ -260,11 +263,20 @@ test_checkTorF <- function()
 
 test_checkForDotC <- function()
 {
-    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::checkForDotC(parsedCode, "testpkg0")
-    checkTrue(length(res) == 2)
-    res
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::findFunctionCall(parsedCode, "testpkg0", ".C")
+    checkTrue(res == 2)
+}
+
+test_checkForBrowser <- function()
+{
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::findFunctionCall(parsedCode, "testpkg0", "browser")
+    checkTrue(res == 1)
 }
 
 test_checkDescriptionNamespaceConsistency <- function()
@@ -293,5 +305,20 @@ test_checkDescriptionNamespaceConsistency <- function()
     checkTrue(BiocCheck:::.warnings$getNum() == 1)
     checkEquals("devtools imported in NAMESPACE but not in DESCRIPTION:Imports",
         BiocCheck:::.warnings$get()[1])
+
+}
+
+test_checkImportSuggestions <- function()
+{
+    if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
+    {
+        suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
+        checkTrue(!is.null(suggestions))
+
+ 
+        BiocCheck:::installAndLoad(create_test_package('testpkg'))
+        suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
+        checkTrue(length(suggestions) == 0)
+    }
 
 }
