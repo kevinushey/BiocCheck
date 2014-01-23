@@ -6,7 +6,10 @@
         make_option("--no-check-vignettes", action="store_true",
             help="disable vignette checks"),
         make_option("--new-package", action="store_true",
-            help="enable checks specific to new packages")
+            help="enable checks specific to new packages"),
+        make_option("--no-check-bioc-views", action="store_true",
+            help="disable biocViews-specific checks (for non-BioC packages)")
+
         )
     parser <- OptionParser(usage = "R CMD BiocCheck [options] package", option_list=option_list)
     arguments <- parse_args(parser, positional_arguments = 1)
@@ -50,8 +53,12 @@ BiocCheck <- function(package, ...)
         checkNewPackageVersionNumber(package_dir)
     }
     checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
-    handleMessage("Checking biocViews...")
-    checkBiocViews(package_dir)
+
+    if (is.null(dots[["no-check-bioc-views"]]))
+    {
+        handleMessage("Checking biocViews...")
+        checkBiocViews(package_dir)
+    }
     handleMessage("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
     handleMessage("Checking unit tests...")
