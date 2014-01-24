@@ -269,7 +269,7 @@ checkImportSuggestions <- function(pkgname)
 
     if ((!is.null(suggestions)) && (!length(suggestions)))
     {
-        message("No suggestions.")
+        message("  No suggestions.")
     }
 
     suggestions

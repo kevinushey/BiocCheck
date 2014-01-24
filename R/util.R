@@ -47,7 +47,7 @@ installAndLoad <- function(pkg)
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
     if (paste0("package:",pkgname) %in% search())
-        unload(file.path(libdir, pkgname))
+        suppressWarnings(unload(file.path(libdir, pkgname)))
     suppressPackageStartupMessages(do.call(library, args))
 }
 
@@ -151,11 +151,11 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
         {
             if (grepl("\\.R$", name, ignore.case=TRUE))
                 message(sprintf("  Found %s%s in %s (line %s, column %s)",
-                    parens, symbolName,
+                    symbolName, parens,
                     mungeName(name, pkgname), x[i,1], x[i,2]))
             else
                 message(sprintf("  Found %s%s in %s",
-                    parens, symbolName,
+                    symbolName, parens,
                     mungeName(name, pkgname))) # FIXME test this
 
         }
