@@ -81,7 +81,7 @@ parseFile <- function(infile, pkgdir)
     {
         dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
         if ("VignetteBuilder" %in% colnames(dcf) &&
-            dcf[, "VignetteBulder"]=="knitr")
+            dcf[, "VignetteBuilder"]=="knitr")
         {
             outfile <- file.path(tempdir(), "parseFile.tmp")
             suppressMessages(capture.output(

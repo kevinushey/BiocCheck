@@ -248,7 +248,9 @@ checkImportSuggestions <- function(pkgname)
     suggestions <- NULL
     tryCatch({
         suppressMessages({
-            suggestions <- capture.output(writeNamespaceImports(pkgname))
+            suppressWarnings({
+                suggestions <- capture.output(writeNamespaceImports(pkgname))
+            })
         })
     },
         error=function(e){

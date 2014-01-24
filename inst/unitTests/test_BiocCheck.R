@@ -84,7 +84,7 @@ test_vignettes0 <- function()
 
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 0 
-        && BiocCheck:::.notes$getNum() == 0,
+        && BiocCheck:::.notes$getNum() == 1,
         "expected no note/warning/error")
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
@@ -94,8 +94,8 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 1 
-        && BiocCheck:::.notes$getNum() == 0,
-        "expected 1 warning")
+        && BiocCheck:::.notes$getNum() == 1,
+        "expected 1 warning, 1 note")
     zeroCounters()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
@@ -331,7 +331,7 @@ test_checkImportSuggestions <- function()
     if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
     {
         suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
-        checkTrue(!is.null(suggestions))
+        checkTrue(!is.null(suggestions)) # sometimes it works and sometimes it doesn't
 
  
         BiocCheck:::installAndLoad(create_test_package('testpkg'))
