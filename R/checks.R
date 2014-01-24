@@ -267,25 +267,6 @@ checkDeprecatedPackages <- function(pkgdir)
 }
 
 
-checkTorF <- function(parsedCode)
-{
-    t <- list()
-    f <- c()
-    for (filename in names(parsedCode))
-    {
-        df <- parsedCode[[filename]]
-        trows <- df[which(df$token == "SYMBOL" & df$text =="T"),]
-        frows <- df[which(df$token == "SYMBOL" & df$text =="F"),]
-        if (nrow(trows) > 0) 
-        hasT <- dim(trows)[1] > 0
-        hasF <- dim(frows)[1] > 0 
-        if (hasT) t <- append(t, filename)
-        if (hasF) f <- append(f, filename)
-
-    }
-    #FIXME - print output
-    list(t=t, f=f) # for tests
-}
 
 
 

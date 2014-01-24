@@ -78,15 +78,25 @@ BiocCheck <- function(package, ...)
 
     parsedCode <- parseFiles(package_dir)
 
-    # FIXME - reactivate
-    #handleMessage("Checking for T and F symbols...")
-    #checkTorF(parsedCode)
+    handleMessage("Checking for T...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "T",
+        "SYMBOL")
+    if (res > 0) handleWarning(sprintf("T was found in %s files",
+        res))
+    handleMessage("Checking for F...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "F",
+        "SYMBOL")
+    if (res > 0) handleWarning(sprintf("F was found in %s files",
+        res))
+
     handleMessage("Checking for .C()...")
-    res <- findFunctionCall(parsedCode, package_name, ".C")
+    res <- findSymbolInParsedCode(parsedCode, package_name, ".C",
+        "SYMBOL_FUNCTION_CALL")
     if (res > 0) handleNote(sprintf(".C() was found in %s files",
         res))
     handleMessage("Checking for browser()...")
-    res <- findFunctionCall(parsedCode, package_name, "browser")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
+        "SYMBOL_FUNCTION_CALL")
     if (res > 0)
         handleWarning(sprintf("browser() was found in %s files",
             res))

@@ -251,14 +251,22 @@ test_parseFile <- function()
 
 test_checkTorF <- function() 
 {
-    DEACTIVATED("not ready yet")
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
             "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::checkTorF(parsedCode)
-    checkTrue(length(res$t) == 1)
-    checkTrue(length(res$f) == 1)
 
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "T",
+        "SYMBOL")
+    checkTrue(res == 1)
+
+
+    ## Even though F is found twice in a single file (morecode.R),
+    ## res is 1, because it keeps track of the number of files that matched,
+    ## not the overall number of matches. Maybe this should change,
+    ## maybe it doesn't matter.
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "F",
+        "SYMBOL")
+    checkTrue(res == 1)
 }
 
 test_checkForDotC <- function()
@@ -266,7 +274,8 @@ test_checkForDotC <- function()
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
             "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::findFunctionCall(parsedCode, "testpkg0", ".C")
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", ".C",
+        "SYMBOL_FUNCTION_CALL")
     checkTrue(res == 2)
 }
 
@@ -275,7 +284,8 @@ test_checkForBrowser <- function()
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
             "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::findFunctionCall(parsedCode, "testpkg0", "browser")
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "browser",
+        "SYMBOL_FUNCTION_CALL")
     checkTrue(res == 1)
 }
 
