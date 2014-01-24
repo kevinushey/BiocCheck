@@ -84,7 +84,8 @@ test_vignettes0 <- function()
 
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 0 
-        && BiocCheck:::.notes$getNum() == 0)
+        && BiocCheck:::.notes$getNum() == 0,
+        "expected no note/warning/error")
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
     dir.create(instdoc, recursive=TRUE)
@@ -93,7 +94,8 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 1 
-        && BiocCheck:::.notes$getNum() == 0)
+        && BiocCheck:::.notes$getNum() == 0,
+        "expected 1 warning")
     zeroCounters()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
@@ -101,6 +103,12 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::.warnings$getNum() == 1, 
         "Rmd file not seen as valid vignette source")
+    zeroCounters()
+    BiocCheck:::checkVignetteDir(system.file("testpackages",
+        "testpkg0", package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+    checkEquals("# of chunks: 2, # of eval=FALSE: 1 (50%)",
+        BiocCheck:::.notes$get()[1])
 }
 
 test_checkVersionNumber <- function()

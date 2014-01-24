@@ -75,10 +75,13 @@ getAllDependencies <- function(pkgdir)
 
 parseFile <- function(infile, pkgdir)
 {
+    # FIXME - use purl to parse RMD and RRST
+    # regardless of VignetteBuilder value
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst", infile, TRUE))
     {
         dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-        if ("VignetteBuilder" %in% colnames(dcf))
+        if ("VignetteBuilder" %in% colnames(dcf) &&
+            dcf[, "VignetteBulder"]=="knitr")
         {
             outfile <- file.path(tempdir(), "parseFile.tmp")
             suppressMessages(capture.output(

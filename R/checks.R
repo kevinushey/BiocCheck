@@ -4,7 +4,7 @@ getVigSources <- function(dir)
 {
     dir(dir,
         pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$",
-        ignore.case=TRUE)
+        ignore.case=TRUE, full.names=TRUE)
 }
 
 checkVignetteDir <- function(pkgdir)
@@ -28,7 +28,23 @@ checkVignetteDir <- function(pkgdir)
         handleWarning("Vignette sources exist in inst/doc/; they belong in vignettes/.")
     }
 
+    chunks <- 0
+    efs <- 0
+    for (file in vigdircontents)
+    {
+        chunks <- chunks +
+            length(grep(">>=|```\\{r|.. \\{r", readLines(file,
+            warn=FALSE)))
+        efs <- efs + 
+            length(grep("eval\\s?=\\s?FALSE", readLines(file,
+            warn=FALSE)))
+    }
 
+    percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
+
+    handleNote(sprintf(
+        "# of chunks: %s, # of eval=FALSE: %s (%s%%)",
+        chunks, efs,  percent))
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
