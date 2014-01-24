@@ -11,7 +11,8 @@
             help="disable biocViews-specific checks (for non-BioC packages)")
 
         )
-    parser <- OptionParser(usage = "R CMD BiocCheck [options] package", option_list=option_list)
+    parser <- OptionParser(usage = "R CMD BiocCheck [options] package",
+        option_list=option_list)
     arguments <- parse_args(parser, positional_arguments = 1)
     opt <- arguments$options
     file <- arguments$args
