@@ -1,3 +1,9 @@
+
+More suggestions are going in the wiki:
+https://github.com/Bioconductor/BiocCheck/wiki
+
+-Detect problematic depends: see Martin's email
+
 Suggestions from Nate:
 - Valid license
 - Make sure every (non-trivial) class has a show() method.
@@ -125,7 +131,7 @@ getNamespaceImports("Rsamtools"))
 - [ ] registration of .Call entry points
    - pkg in getLoadedDLLS() but no getDLLRegistredRoutines()
 - [ ] library(MyPackage) / require() in man pages
-- print() cat() message() warning() error() (mis)use?
+- print() cat() message() warning() stop() (mis)use?
 **** Other? (note)
 - [ ] use of .C
 - [ ] \seealso{} (times used; more is better)

@@ -37,8 +37,12 @@ BiocCheck <- function(package, ...)
 
     handleMessage(sprintf("This is BiocCheck, version %s.",
         packageVersion("BiocCheck")))
+
+
+    handleMessage("Doing preinstall checks...")
+
     handleMessage("Installing package...")
-    installAndLoad(package)
+    installAndLoad(package, TRUE)
 
 
     ## checks

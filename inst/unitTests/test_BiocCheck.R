@@ -340,3 +340,8 @@ test_checkImportSuggestions <- function()
     }
 
 }
+
+test_checkForBadDepends <- function()
+{
+    stop("we need a test here!")
+}

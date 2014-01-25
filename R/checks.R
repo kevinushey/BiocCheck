@@ -368,3 +368,38 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
 
     }
 }
+
+## Note, this should only be run when pkgname is installed
+## but NOT attached to the search path.
+checkForBadDepends <- function(pkgname)
+{
+    oldQuotes <- getOption("useFancyQuotes")
+    on.exit(options(useFancyQuotes=oldQuotes))
+    options(useFancyQuotes=FALSE)
+
+    output <- capture.output(checkUsageEnv(getNamespace(pkgname),
+        all=FALSE, suppressLocal=TRUE))
+    if (!is.null(output))
+    {
+        res <- regexpr("'[^']*'$", output)
+        fns <- regexpr("^[^:]*:", output)
+        fmatch.length <- attr(fns, "match.length")
+        if (any(res != -1))
+        {
+            res <- substr(output, res, nchar(output))
+            fns <- unique(substr(output, fns, fmatch.length-1))
+            res <- gsub("'", "", fixed=TRUE, res)
+            res <- unique(res)
+            badFunctions <- paste(fns, collapse=", ")
+            badObjects <- paste(res, collapse=", ")
+            msg <- sprintf(paste0(
+                "Packages that provide %s\n",
+                "  (used in %s)\n",
+                "  should be in Imports, not Depends (and imported in NAMESPACE),\n",
+                "  otherwise packages that import %s could fail."),
+                badObjects, badFunctions, pkgname)
+            handleError(msg)
+        }
+    }
+
+}
