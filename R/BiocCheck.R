@@ -23,6 +23,7 @@
 
 BiocCheck <- function(package, ...)
 {
+    package <- normalizePath(package)
     d <- list(...)
     if (length(d))
         dots <- list(...)[[1]]
