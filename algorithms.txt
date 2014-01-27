@@ -1,0 +1,8 @@
+algorithm for finding library/require(mypkg):
+
+find SYMBOL_FUNCTION_CALL library or require
+foreach of them:
+    go down 1 row, get parent, call it p, call this row i1
+    get last row with parent p, call that i2.
+    between i and i2 (non-inclusive) is a row with either sybol, epxr or STR_CONST whose text is (?) mypkg, mypkg, 'mypkg', or "mypkg"
+
