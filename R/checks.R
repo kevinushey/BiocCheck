@@ -377,7 +377,7 @@ checkForBadDepends <- function(pkgdir)
 
     if (!is.null(output))
     {
-        output <- output[[1]]
+        output <- strsplit(output, "\n")[[1]]
         res <- regexpr("'[^']*'$", output)
         fns <- regexpr("^[^:]*:", output)
         fmatch.length <- attr(fns, "match.length")
@@ -406,23 +406,12 @@ checkForBadDepends <- function(pkgdir)
 
 getBadDeps <- function(pkgdir)
 {
-    sendme <- function()
-    {
-        suppressMessages({
-            suppressWarnings({
-                options(useFancyQuotes=FALSE)
-                .libPaths(c(pkgdir, .libPaths()))
-                library(codetools)
-                pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
-                return(capture.output(checkUsageEnv(getNamespace(pkgname))))
-            })
-        })
-    }
 
-    cl <- makePSOCKcluster("localhost")
-    clusterExport(cl, c("pkgdir", "sendme"), envir=environment())
-    res <- clusterEvalQ(cl, sendme())
-    stopCluster(cl)
+    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    args <- sprintf("-q --vanilla --slave -f %s --args %s",
+        system.file("script", "checkBadDeps.R", package="BiocCheck"),
+        dQuote(pkgdir))
+    res <- system2(cmd, args, stdout=TRUE, stderr=FALSE)
     res
 }
 
