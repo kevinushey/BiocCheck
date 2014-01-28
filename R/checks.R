@@ -369,18 +369,15 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
     }
 }
 
-## Note, this should only be run when pkgname is installed
-## but NOT attached to the search path.
-checkForBadDepends <- function(pkgname)
+## Make sure this is run after pkg is installed.
+checkForBadDepends <- function(pkgdir)
 {
-    oldQuotes <- getOption("useFancyQuotes")
-    on.exit(options(useFancyQuotes=oldQuotes))
-    options(useFancyQuotes=FALSE)
+    pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+    output <- getBadDeps(pkgdir)
 
-    output <- capture.output(checkUsageEnv(getNamespace(pkgname),
-        all=FALSE, suppressLocal=TRUE))
     if (!is.null(output))
     {
+        output <- output[[1]]
         res <- regexpr("'[^']*'$", output)
         fns <- regexpr("^[^:]*:", output)
         fmatch.length <- attr(fns, "match.length")
@@ -402,4 +399,69 @@ checkForBadDepends <- function(pkgname)
         }
     }
 
+}
+
+
+
+
+getBadDeps <- function(pkgdir)
+{
+    sendme <- function()
+    {
+        suppressMessages({
+            suppressWarnings({
+                options(useFancyQuotes=FALSE)
+                .libPaths(c(pkgdir, .libPaths()))
+                library(codetools)
+                pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+                return(capture.output(checkUsageEnv(getNamespace(pkgname))))
+            })
+        })
+    }
+
+    cl <- makePSOCKcluster("localhost")
+    clusterExport(cl, c("pkgdir", "sendme"), envir=environment())
+    res <- clusterEvalQ(cl, sendme())
+    stopCluster(cl)
+    res
+}
+
+doesFileLoadPackage <- function(df, pkgname)
+{
+    df <- cbind(df, idx=seq_along(1:nrow(df)))
+    res <- c()
+    regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
+    max <- nrow(df)
+    reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
+        df$text %in% c("library","require"),]
+    for (i in 1:nrow(reqs))
+    {
+        currIdx <- reqs[i, "idx"]
+        if ((currIdx + 1) >= max) return(res)
+        i1 = df[df$idx == currIdx+1,]
+        p <- i1$parent
+        rowsWithThatParent <- df[df$parent == p,]
+        lastRowWithThatParent <-
+            rowsWithThatParent[nrow(rowsWithThatParent),]
+        rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
+        for (j in 1:nrow(rowsToCheck))
+        {
+            curRow <- rowsToCheck[j,]
+            if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
+                grepl(regex, curRow$text))
+            {
+                res <- append(res, curRow$line1)
+            }
+        }
+    }    
+    res
+}
+
+
+checkForLibraryMe <- function(pkgname, parsedCode)
+{
+    for (filename in names(parsedCode))
+    {
+        df <- parsedCode[[filename]]
+    }
 }

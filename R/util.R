@@ -28,7 +28,7 @@ handleNote <- function(msg)
     .msg("* NOTE: %s", msg)
 }
 
-installAndLoad <- function(pkg, checkForBadDepends=FALSE)
+installAndLoad <- function(pkg)
 {
     libdir <- file.path(tempdir(), "lib")
     unlink(libdir, recursive=TRUE)
@@ -48,21 +48,6 @@ installAndLoad <- function(pkg, checkForBadDepends=FALSE)
     args <- list(package=pkgname, lib.loc=libdir)
     if (paste0("package:",pkgname) %in% search())
         suppressWarnings(unload(file.path(libdir, pkgname)))
-
-
-    ## Now is a good time to run the one check that depends
-    ## on the package being installed but NOT loaded,
-    ## though this is disabled by default with the 
-    ## checkForBadDepends argument above.
-    if (checkForBadDepends)
-    {
-        handleMessage("Check for Depends: errors...")
-        old.libPaths <- .libPaths()
-        on.exit(.libPaths(old.libPaths))
-        .libPaths(c(libdir, .libPaths()))
-        checkForBadDepends(pkgname)
-        .libPaths(old.libPaths)
-    }
 
     suppressPackageStartupMessages(do.call(library, args))
 }

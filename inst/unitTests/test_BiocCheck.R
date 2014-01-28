@@ -343,5 +343,9 @@ test_checkImportSuggestions <- function()
 
 test_checkForBadDepends <- function()
 {
-    stop("we need a test here!")
+    #DEACTIVATED("need more info to fix this")
+    BiocCheck:::checkForBadDepends(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.errors$getNum())
+    checkTrue(grepl("baddep", BiocCheck:::.errors$get()[1]))
 }

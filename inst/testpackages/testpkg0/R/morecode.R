@@ -6,4 +6,5 @@ if (FALSE) parse_Rd("some_file")
 
 if (F) print("howdy!")
 
-if(T) print("halloooo")
+if (FALSE)
+    if(T) print("halloooo")

@@ -40,10 +40,11 @@ BiocCheck <- function(package, ...)
         packageVersion("BiocCheck")))
 
 
-    handleMessage("Doing preinstall checks...")
 
     handleMessage("Installing package...")
-    installAndLoad(package, TRUE)
+    installAndLoad(package)
+
+    checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
 
     ## checks
