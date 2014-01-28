@@ -442,7 +442,6 @@ getFunctionLengths <- function(df)
                 {
                     funcName <- up4$text
                     funcStartLine <- up4$line1
-                    #.printf("function name is %s starting on line %s", funcName, funcStartLine)
                 }
             }
             j <- funcRow$idx + 1
