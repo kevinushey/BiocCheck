@@ -406,13 +406,14 @@ checkForBadDepends <- function(pkgdir)
 
 getBadDeps <- function(pkgdir)
 {
-
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    oldquotes <- getOption("useFancyQuotes")
+    on.exit(options(useFancyQuotes=oldquotes))
+    options(useFancyQuotes=FALSE)
     args <- sprintf("-q --vanilla --slave -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
         dQuote(pkgdir))
-    res <- system2(cmd, args, stdout=TRUE, stderr=FALSE)
-    res
+    system2(cmd, args, stdout=TRUE, stderr=FALSE)
 }
 
 doesFileLoadPackage <- function(df, pkgname)
@@ -423,36 +424,39 @@ doesFileLoadPackage <- function(df, pkgname)
     max <- nrow(df)
     reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
         df$text %in% c("library","require"),]
-    for (i in 1:nrow(reqs))
+    if (nrow(reqs))
     {
-        reqRow <- reqs[i,]
-        currIdx <- reqs[i, "idx"]
-        if ((currIdx + 1) >= max) return(res)
-        i1 = df[df$idx == currIdx+1,]
-        p <- i1$parent
-        rowsWithThatParent <- df[df$parent == p,]
-        lastRowWithThatParent <-
-            rowsWithThatParent[nrow(rowsWithThatParent),]
-        rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
-        for (j in 1:nrow(rowsToCheck))
+        for (i in 1:nrow(reqs))
         {
-            curRow <- rowsToCheck[j,]
-            if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
-                grepl(regex, curRow$text))
+            reqRow <- reqs[i,]
+            currIdx <- reqs[i, "idx"]
+            if ((currIdx + 1) >= max) return(res)
+            i1 = df[df$idx == currIdx+1,]
+            p <- i1$parent
+            rowsWithThatParent <- df[df$parent == p,]
+            lastRowWithThatParent <-
+                rowsWithThatParent[nrow(rowsWithThatParent),]
+            rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
+            for (j in 1:nrow(rowsToCheck))
             {
-                prevRow <- df[curRow$idx -1,]
-                prevPrevRow <- df[curRow$idx -2,]
-                if (!(prevRow$token == "EQ_SUB" && 
-                    prevRow$text == "=" &&
-                    prevPrevRow$token == "SYMBOL_SUB" &&
-                    prevPrevRow$text == "help"))
+                curRow <- rowsToCheck[j,]
+                if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
+                    grepl(regex, curRow$text))
                 {
-                    res <- append(res, reqRow$line1)
+                    prevRow <- df[curRow$idx -1,]
+                    prevPrevRow <- df[curRow$idx -2,]
+                    if (!(prevRow$token == "EQ_SUB" && 
+                        prevRow$text == "=" &&
+                        prevPrevRow$token == "SYMBOL_SUB" &&
+                        prevPrevRow$text == "help"))
+                    {
+                        res <- append(res, reqRow$line1)
+                    }
                 }
             }
-        }
-    }    
+        }    
     res
+    }
 }
 
 
@@ -461,5 +465,18 @@ checkForLibraryMe <- function(pkgname, parsedCode)
     for (filename in names(parsedCode))
     {
         df <- parsedCode[[filename]]
+        res <- doesFileLoadPackage(df, pkgname)
+        if (length(res))
+        {
+            msg <- sprintf("library or require called on %s in file %s",
+                pkgname, mungeName(filename, pkgname))
+            if (grepl("\\.R$", filename, ignore.case=TRUE))
+            {
+                msg <- sprintf("%s, line %s", msg, 
+                    paste(res, collapse=","))
+            }
+            msg <- sprintf("%s; this is not necessary.", msg)
+            handleMessage(msg)
+        }
     }
 }

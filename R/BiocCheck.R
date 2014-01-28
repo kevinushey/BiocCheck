@@ -108,6 +108,11 @@ BiocCheck <- function(package, ...)
         handleWarning(sprintf("browser() was found in %s files",
             res))
 
+    handleMessage(sprintf("Checking for library/require of %s....",
+        package_name))
+    checkForLibraryMe(package_name, parsedCode)
+
+
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
 
