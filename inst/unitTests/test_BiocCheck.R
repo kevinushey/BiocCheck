@@ -343,9 +343,17 @@ test_checkImportSuggestions <- function()
 
 test_checkForBadDepends <- function()
 {
-    #DEACTIVATED("need more info to fix this")
+    DEACTIVATED("on back burner")
     BiocCheck:::checkForBadDepends(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
     checkEquals(1, BiocCheck:::.errors$getNum())
     checkTrue(grepl("baddep", BiocCheck:::.errors$get()[1]))
+}
+
+test_doesFileLoadPackage <- function()
+{
+    df <- getParseData(parse(system.file("testpackages", "testpkg0",
+        "R", "requireme.R")))
+    res <- BiocCheck:::doesFileLoadPackage(df, "testpkg0")
+    checkEquals(c(3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 12L, 13L, 14L), res)
 }

@@ -1,4 +1,3 @@
-
 if (FALSE)
 {
     library(testpkg0)
@@ -12,7 +11,8 @@ if (FALSE)
     require(package = teskpkg0)
     require('testpkg0')
     library('testpkg0')
-    require(lib.loc=NULL, package=testpkg0)
+    require(lib.loc=NULL, 
+        package=testpkg0)
     #bad:
     require(help=testpkg0)
     require(lib.loc=NULL, help = 

@@ -436,6 +436,7 @@ doesFileLoadPackage <- function(df, pkgname)
         df$text %in% c("library","require"),]
     for (i in 1:nrow(reqs))
     {
+        reqRow <- reqs[i,]
         currIdx <- reqs[i, "idx"]
         if ((currIdx + 1) >= max) return(res)
         i1 = df[df$idx == currIdx+1,]
@@ -450,7 +451,15 @@ doesFileLoadPackage <- function(df, pkgname)
             if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
                 grepl(regex, curRow$text))
             {
-                res <- append(res, curRow$line1)
+                prevRow <- df[curRow$idx -1,]
+                prevPrevRow <- df[curRow$idx -2,]
+                if (!(prevRow$token == "EQ_SUB" && 
+                    prevRow$text == "=" &&
+                    prevPrevRow$token == "SYMBOL_SUB" &&
+                    prevPrevRow$text == "help"))
+                {
+                    res <- append(res, reqRow$line1)
+                }
             }
         }
     }    
