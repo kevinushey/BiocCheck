@@ -27,4 +27,7 @@ algorithm for finding length of functions:
 # line of the function, line1 of "s" is the first line of it, and
 # the name of the function is s$text, and the number of lines is lastline - firstline
 # or 1, whichever is higher.
+an exception is a function at the very end of a file. you won't find another 
+row with a higher parent, but the last row is the last line of the function.
+
 

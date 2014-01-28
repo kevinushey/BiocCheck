@@ -416,6 +416,65 @@ getBadDeps <- function(pkgdir)
     system2(cmd, args, stdout=TRUE, stderr=FALSE)
 }
 
+
+
+getFunctionLengths <- function(df)
+{
+    df <- cbind(df, idx=seq_along(1:nrow(df)))
+    max <- nrow(df)
+    res <- c()
+    funcRows <- df[df$token == "FUNCTION",]
+    if (nrow(funcRows))
+    {
+        for (i in 1:nrow(funcRows))
+        {
+            funcRow <- funcRows[i,]
+            funcStartLine <- funcRow$line1 # this might get updated later
+            funcLines <- NULL
+            funcName <- "(anonymous)"
+            # attempt to get function name
+            if (funcRow$idx >= 5)
+            {
+                up2 <- df[funcRow$idx - 2,]
+                up4 <- df[funcRow$idx - 4,]
+                if (up2$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
+                    up4$token == "SYMBOL")
+                {
+                    funcName <- up4$text
+                    funcStartLine <- up4$line1
+                    #.printf("function name is %s starting on line %s", funcName, funcStartLine)
+                }
+            }
+            j <- funcRow$idx + 1
+            saveme <- NULL
+            while (TRUE)
+            {
+                thisRow <- df[df$idx == j,]
+                if (thisRow$idx == max || thisRow$parent > funcRow$parent)
+                {
+                    lineToExamine <- ifelse(thisRow$idx == max, max, saveme)
+                    endLine <- df[df$idx == lineToExamine, "line2"]
+                    if (endLine - funcStartLine == 0)
+                        funcLines <- 1
+                    else
+                        funcLines <- endLine - (funcStartLine -1)
+                    res <- append(res, funcLines)
+                    names(res)[length(res)] <- paste(funcName, funcStartLine, sep=":")
+                    break
+                } else {
+                    if (thisRow$parent > 0) 
+                    {
+                        saveme <- thisRow$idx
+                    }
+                }
+                j <- j + 1
+            }
+
+        }
+    }
+    res
+}
+
 doesFileLoadPackage <- function(df, pkgname)
 {
     df <- cbind(df, idx=seq_along(1:nrow(df)))
