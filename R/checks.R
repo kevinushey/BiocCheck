@@ -43,8 +43,8 @@ checkVignetteDir <- function(pkgdir)
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
 
     handleNote(sprintf(
-        "# of chunks: %s, # of eval=FALSE: %s (%s%%)",
-        chunks, efs,  percent))
+        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
+        chunks, efs,  as.integer(percent)))
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -417,12 +417,12 @@ getBadDeps <- function(pkgdir)
 }
 
 
-
+## FIXME - turns out this is slow when run against
 getFunctionLengths <- function(df)
 {
     df <- cbind(df, idx=seq_along(1:nrow(df)))
     max <- nrow(df)
-    res <- c()
+    res <- list()
     funcRows <- df[df$token == "FUNCTION",]
     if (nrow(funcRows))
     {
@@ -431,7 +431,7 @@ getFunctionLengths <- function(df)
             funcRow <- funcRows[i,]
             funcStartLine <- funcRow$line1 # this might get updated later
             funcLines <- NULL
-            funcName <- "(anonymous)"
+            funcName <- "_anonymous_"
             # attempt to get function name
             if (funcRow$idx >= 5)
             {
@@ -453,12 +453,11 @@ getFunctionLengths <- function(df)
                 {
                     lineToExamine <- ifelse(thisRow$idx == max, max, saveme)
                     endLine <- df[df$idx == lineToExamine, "line2"]
-                    if (endLine - funcStartLine == 0)
-                        funcLines <- 1
-                    else
-                        funcLines <- endLine - (funcStartLine -1)
-                    res <- append(res, funcLines)
-                    names(res)[length(res)] <- paste(funcName, funcStartLine, sep=":")
+                    funcLines <- endLine - (funcStartLine -1)
+                    if(funcName == "_anonymous_") funcName <- paste0(funcName, ".",
+                        funcStartLine)
+                    res[[funcName]] <- c(length=funcLines,
+                        startLine=funcStartLine, endLine=endLine)
                     break
                 } else {
                     if (thisRow$parent > 0) 
@@ -522,19 +521,75 @@ checkForLibraryMe <- function(pkgname, parsedCode)
 {
     for (filename in names(parsedCode))
     {
+        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
+            next
         df <- parsedCode[[filename]]
-        res <- doesFileLoadPackage(df, pkgname)
-        if (length(res))
+        if (nrow(df))
         {
-            msg <- sprintf("library or require called on %s in file %s",
-                pkgname, mungeName(filename, pkgname))
-            if (grepl("\\.R$", filename, ignore.case=TRUE))
+            res <- doesFileLoadPackage(df, pkgname)
+            if (length(res))
             {
-                msg <- sprintf("%s, line %s", msg, 
-                    paste(res, collapse=","))
+                msg <- sprintf("library or require called on %s in file %s",
+                    pkgname, mungeName(filename, pkgname))
+                if (grepl("\\.R$", filename, ignore.case=TRUE))
+                {
+                    msg <- sprintf("%s, line %s", msg, 
+                        paste(res, collapse=","))
+                }
+                msg <- sprintf("%s; this is not necessary.", msg)
+                handleMessage(msg)
             }
-            msg <- sprintf("%s; this is not necessary.", msg)
-            handleMessage(msg)
+        }
+    }
+}
+
+checkFunctionLengths <- function(parsedCode, pkgname)
+{
+    df <- data.frame(stringsAsFactors=FALSE)
+    i <- 1
+    for (filename in names(parsedCode))
+    {
+        .debug("filename is %s", filename)
+        pc <- parsedCode[[filename]]
+        filename <- mungeName(filename, pkgname)
+        res <- getFunctionLengths(pc)
+        for (name in names(res)) {
+            x <- res[[name]]
+            if (length(x))
+            {
+                df[i,1] <- filename
+                df[i,2] <- name
+                df[i,3] <- x['length']
+                df[i,4] <- x['startLine']
+                df[i,5] <- x['endLine']
+            }
+            i <- i + 1
+        }
+    }
+
+    colnames <- c("filename","functionName","length","startLine","endLine")
+    if (ncol(df) == length(colnames))
+    {
+        colnames(df) <- colnames
+        df <- df[with(df, order(-length)),]
+        h <- head(df, n=5)
+        if (nrow(h))
+        {
+            handleMessage(sprintf(
+                "  The longest function is %s lines long", max(h$length)))
+            handleMessage(sprintf("  The longest %s functions are:", nrow(h)))
+            for (i in 1:nrow(h))
+            {
+                row <- df[i,]
+                if (grepl("\\.R$", row$filename, ignore.case=TRUE))
+                {
+                    handleMessage(sprintf("    %s() (%s, line %s): %s lines",
+                        row$functionName, row$filename, row$startLine, row$length))
+                } else {
+                    handleMessage(sprintf("    %s() (%s): %s lines",
+                        row$functionName, row$filename, row$length))
+                }
+            }
         }
     }
 }

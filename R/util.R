@@ -1,5 +1,7 @@
 .printf <- function(...) cat(noquote(sprintf(...)), "\n")
 
+.debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
+    .printf(...)
 .msg <- function(...) message(noquote(sprintf(...)))
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
@@ -92,8 +94,9 @@ parseFile <- function(infile, pkgdir)
             oldwd <- getwd()
             on.exit(setwd(oldwd))
             setwd(tempdir())
-            outfile <- file.path(tempdir(), sub("\\.Rnw$", ".R", TRUE), basename(infile))
-            Stangle(infile)
+            outfile <- file.path(tempdir(),
+                sub("\\.Rnw$", ".R", basename(infile), ignore.case=TRUE))
+            capture.output(Stangle(infile))
         }
     } else if (grepl("\\.Rd", infile, TRUE)) 
     {
@@ -121,7 +124,8 @@ parseFiles <- function(pkgdir)
     for (file in files)
     {
         df <- parseFile(file, pkgdir)
-        parsedCode[[file]] <- df
+        if (nrow(df))
+            parsedCode[[file]] <- df
     }
     parsedCode
 }

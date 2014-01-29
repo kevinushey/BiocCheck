@@ -78,7 +78,7 @@ BiocCheck <- function(package, ...)
         checkImportSuggestions(package_name)
     }
 
-    handleMessage("Checking for deprecated package usage....")
+    handleMessage("Checking for deprecated package usage...")
     checkDeprecatedPackages(package_dir)
 
     handleMessage("Parsing R code in R directory, examples, vignettes...")
@@ -108,7 +108,7 @@ BiocCheck <- function(package, ...)
         handleWarning(sprintf("browser() was found in %s files",
             res))
 
-    handleMessage(sprintf("Checking for library/require of %s....",
+    handleMessage(sprintf("Checking for library/require of %s...",
         package_name))
     checkForLibraryMe(package_name, parsedCode)
 
@@ -116,8 +116,12 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
 
+    handleMessage("Checking function lengths...")
+    checkFunctionLengths(parsedCode, package_name)
+
+
     ## Summary
-    .msg("Summary:")
+    .msg("\nSummary:")
     .msg("REQUIRED count: %s", .errors$getNum())
     .msg("RECOMMENDED count: %s", .warnings$getNum())
     .msg("NOTE count: %s", .notes$getNum())

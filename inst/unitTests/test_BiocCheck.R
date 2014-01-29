@@ -358,15 +358,35 @@ test_doesFileLoadPackage <- function()
     checkEquals(c(3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 12L, 13L, 14L), res)
 }
 
+test_checkForLibraryMe <- function()
+{
+    load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
+    BiocCheck:::checkForLibraryMe("IRanges", IRangesParsedCode)
+}
+
 test_getFunctionLengths <- function()
 {
-    file <- system.file("unitTests", "parseme.R", package="BiocCheck")
+    file <- system.file("testpackages", "testpkg0", "R",
+        "parseme.R", package="BiocCheck")
     df <- getParseData(parse(file, keep.source=TRUE))
     res <- BiocCheck:::getFunctionLengths(df)
     expected <-
-        structure(c(2, 1, 1, 5, 4, 6, 1, 1, 6), .Names = c("(anonymous):1", 
-        "fa:3", "f2:6", "f3:9", "f4:16", "(anonymous):23", "f5:31", "f6:33", 
-        "f7:35"))
+        structure(list(`_anonymous_.1` = structure(c(2, 1, 2), .Names = c("length", 
+        "startLine", "endLine")), fa = structure(c(1, 3, 3), .Names = c("length", 
+        "startLine", "endLine")), f2 = structure(c(1, 6, 6), .Names = c("length", 
+        "startLine", "endLine")), f3 = structure(c(5, 9, 13), .Names = c("length", 
+        "startLine", "endLine")), f4 = structure(c(4, 16, 19), .Names = c("length", 
+        "startLine", "endLine")), `_anonymous_.23` = structure(c(6, 23, 
+        28), .Names = c("length", "startLine", "endLine")), f5 = structure(c(1, 
+        31, 31), .Names = c("length", "startLine", "endLine")), f6 = structure(c(1, 
+        33, 33), .Names = c("length", "startLine", "endLine")), f7 = structure(c(6, 
+        35, 40), .Names = c("length", "startLine", "endLine"))), .Names = c("_anonymous_.1", 
+        "fa", "f2", "f3", "f4", "_anonymous_.23", "f5", "f6", "f7"))
     checkTrue(all.equal(expected, res))
-    checkTrue(all.equal(names(expected), names(res)))
+}
+
+test_getFunctionLengths2 <- function()
+{
+    load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
+    BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)    
 }
