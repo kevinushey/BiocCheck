@@ -2,13 +2,14 @@
 
 .debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
     .printf(...)
-.msg <- function(...) message(noquote(sprintf(...)))
+.msg <- function(..., appendLF=TRUE)
+    message(noquote(sprintf(...)), appendLF=appendLF)
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 
-handleMessage <- function(msg)
+handleMessage <- function(msg, appendLF=TRUE)
 {
-    .msg("* %s", msg)
+    .msg("* %s", msg, appendLF=appendLF)
 }
 
 handleError <- function(msg)

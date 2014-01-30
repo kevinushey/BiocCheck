@@ -425,6 +425,7 @@ getFunctionLengths <- function(df)
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]
+    lst<-lapply(split(df, rownames(df)), as.list)
     if (nrow(funcRows))
     {
         for (i in 1:nrow(funcRows))
@@ -437,8 +438,10 @@ getFunctionLengths <- function(df)
             # attempt to get function name
             if (funcRowId >= 3) 
             {
-                up1 <- df[as.character(funcRowId - 1),]
-                up2 <- df[as.character(funcRowId - 2),]
+                up1 <- lst[[as.character(funcRowId -1)]]
+                #up1 <- df[as.character(funcRowId - 1),]
+                #up2 <- df[as.character(funcRowId - 2),]
+                up2 <- lst[[as.character(funcRowId -2)]]
                 if (up1$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
                     up2$token == "SYMBOL")
                 {
@@ -450,12 +453,15 @@ getFunctionLengths <- function(df)
             saveme <- NULL
             while (TRUE)
             {
-                thisRowId <- as.integer(rownames(df)[j])
-                thisRow <- df[thisRowId,]
+                #thisRowId <- as.integer(rownames(df)[j])
+                thisRowId <- j
+                #thisRow <- df[thisRowId,]
+                thisRow <- lst[[as.character(thisRowId)]]
                 if (thisRowId == max || thisRow$parent > funcRow$parent)
                 {
                     lineToExamine <- ifelse(thisRowId == max, max, saveme)
-                    endLine <- df[rownames(df) == as.character(lineToExamine), "line2"]
+                    #endLine <- df[rownames(df) == as.character(lineToExamine), "line2"]
+                    endLine <- lst[[as.character(lineToExamine)]]$line2
                     funcLines <- endLine - (funcStartLine -1)
                     if(funcName == "_anonymous_") funcName <- paste0(funcName, ".",
                         funcStartLine)
@@ -552,7 +558,8 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     i <- 1
     for (filename in names(parsedCode))
     {
-        .debug("filename is %s", filename)
+        #.debug("filename is %s", filename)
+        message(".", appendLF=FALSE)
         pc <- parsedCode[[filename]]
         filename <- mungeName(filename, pkgname)
         res <- getFunctionLengths(pc)
@@ -569,7 +576,8 @@ checkFunctionLengths <- function(parsedCode, pkgname)
             i <- i + 1
         }
     }
-
+    message("")
+    
     colnames <- c("filename","functionName","length","startLine","endLine")
     if (ncol(df) == length(colnames))
     {

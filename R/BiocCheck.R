@@ -116,7 +116,7 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
 
-    handleMessage("Checking function lengths...")
+    handleMessage("Checking function lengths", appendLF=FALSE)
     checkFunctionLengths(parsedCode, package_name)
 
 
