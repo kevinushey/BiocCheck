@@ -420,7 +420,8 @@ getBadDeps <- function(pkgdir)
 ## FIXME - turns out this is slow when run against
 getFunctionLengths <- function(df)
 {
-    df <- cbind(df, idx=seq_along(1:nrow(df)))
+    df <- df[df$terminal & df$parent > -1,]
+    rownames(df) <- seq_along(1:nrow(df))
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]
@@ -428,31 +429,33 @@ getFunctionLengths <- function(df)
     {
         for (i in 1:nrow(funcRows))
         {
-            funcRow <- funcRows[i,]
+            funcRowId <- as.integer(rownames(funcRows)[i])
+            funcRow <- funcRows[as.character(funcRowId),]
             funcStartLine <- funcRow$line1 # this might get updated later
             funcLines <- NULL
             funcName <- "_anonymous_"
             # attempt to get function name
-            if (funcRow$idx >= 5)
+            if (funcRowId >= 3) 
             {
-                up2 <- df[funcRow$idx - 2,]
-                up4 <- df[funcRow$idx - 4,]
-                if (up2$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
-                    up4$token == "SYMBOL")
+                up1 <- df[as.character(funcRowId - 1),]
+                up2 <- df[as.character(funcRowId - 2),]
+                if (up1$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
+                    up2$token == "SYMBOL")
                 {
-                    funcName <- up4$text
-                    funcStartLine <- up4$line1
+                    funcName <- up2$text
+                    funcStartLine <- up2$line1
                 }
             }
-            j <- funcRow$idx + 1
+            j <- funcRowId + 1
             saveme <- NULL
             while (TRUE)
             {
-                thisRow <- df[df$idx == j,]
-                if (thisRow$idx == max || thisRow$parent > funcRow$parent)
+                thisRowId <- as.integer(rownames(df)[j])
+                thisRow <- df[thisRowId,]
+                if (thisRowId == max || thisRow$parent > funcRow$parent)
                 {
-                    lineToExamine <- ifelse(thisRow$idx == max, max, saveme)
-                    endLine <- df[df$idx == lineToExamine, "line2"]
+                    lineToExamine <- ifelse(thisRowId == max, max, saveme)
+                    endLine <- df[rownames(df) == as.character(lineToExamine), "line2"]
                     funcLines <- endLine - (funcStartLine -1)
                     if(funcName == "_anonymous_") funcName <- paste0(funcName, ".",
                         funcStartLine)
@@ -462,7 +465,7 @@ getFunctionLengths <- function(df)
                 } else {
                     if (thisRow$parent > 0) 
                     {
-                        saveme <- thisRow$idx
+                        saveme <- thisRowId
                     }
                 }
                 j <- j + 1
