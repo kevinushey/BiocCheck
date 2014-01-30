@@ -108,6 +108,12 @@ BiocCheck <- function(package, ...)
         handleWarning(sprintf("browser() was found in %s files",
             res))
 
+    handleMessage("Checking for <<-...")
+res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
+    "LEFT_ASSIGN")
+if (res > 0)
+    handleWarning(sprintf("<<- was found in %s files", res))
+
     handleMessage(sprintf("Checking for library/require of %s...",
         package_name))
     checkForLibraryMe(package_name, parsedCode)
