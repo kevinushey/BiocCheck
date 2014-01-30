@@ -117,7 +117,7 @@ new todos 1/15/14
        all(unmangled(packageDescription("Rsamtools")$Imports) %in% 
 getNamespaceImports("Rsamtools"))
 - [0/1] vignette
-   - [ ] % eval=FALSE chunks
+   - [..] % eval=FALSE chunks (noted but it's not a warning...)
 - [0/1] inst/doc
    - [X] vignette sources (Rnw, Rmd, Rrst)
 - [0/1] man

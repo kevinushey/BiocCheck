@@ -390,3 +390,13 @@ test_getFunctionLengths2 <- function()
     load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
     BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)    
 }
+
+test_checkExportsAreDocumented <- function()
+{
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::installAndLoad(pkgdir)
+    res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
+    checkEquals(res, 
+        "  Man page baddep.Rd documents exported\n  topic(s) baddep\n  but has no runnable examples.")
+    checkEquals(1, BiocCheck:::.errors$getNum())
+}

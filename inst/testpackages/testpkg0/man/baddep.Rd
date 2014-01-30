@@ -1,21 +1,15 @@
-\name{a}
-\alias{a}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ bla
-%%  ~~function to do ... ~~
+\name{baddep}
+\alias{baddep}
+\title{
+baddep
 }
-\description{ bla
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+\description{
+desc
 }
 \usage{
-a(x)
+baddep()
 }
 %- maybe also 'usage' for other objects documented here.
-\arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
-}
-}
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
@@ -42,24 +36,18 @@ a(x)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-#syntaks errir
-   ##---- Should be DIRECTLY executable !! ----
+##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
-\dontrun{
-    this is  a syntax error!
-    }
-
 
 ## The function is currently defined as
-function (x) 
+\dontrun{
+function () 
 {
-
-
-
+    isValidJSON("{\"foo\": \"bar\"}")
   }
 }
-
+}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

@@ -604,3 +604,74 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         }
     }
 }
+
+## This needs work. Doesn't R CMD check do this anyway?
+old.checkExportsAreDocumented <- function(pkgdir, pkgname)
+{
+    namesAndAliases <- character(0)
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    for (manpage in manpages)
+    {
+        rd <- parse_Rd(manpage)
+        name <- 
+            unlist(rd[unlist(lapply(rd, function(x) 
+                attr(x, "Rd_tag") == "\\name"))][[1]][1])
+        aliases <- unlist(lapply(rd[unlist(lapply(rd,
+            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
+        namesAndAliases <- append(namesAndAliases, c(name, aliases))
+    }
+    exports <- getNamespaceExports(pkgname)
+    bad <- (!exports %in% unique(namesAndAliases))
+    exports[bad]
+}
+
+doesManPageHaveRunnableExample <- function(rd)
+{
+    hasExamples <- any(unlist(lapply(rd,
+        function(x) attr(x, "Rd_tag") == "\\examples")))
+    if (!hasExamples) return(FALSE)
+    ex <- capture.output(Rd2ex(rd))
+    ex <- grep("^\\s*$", ex, invert=TRUE, value=TRUE)
+    ex <- grep("^\\s*#", value=TRUE, ex, invert=TRUE)
+    ex <- ex[nchar(ex) > 0]
+    as.logical(length(ex))
+}
+
+# Which pages document things that are exported?
+checkExportsAreDocumented <- function(pkgdir, pkgname)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    exports <- getNamespaceExports(pkgname)
+    msgs <- character(0)
+    for (manpage in manpages)
+    {
+        rd <- parse_Rd(manpage)
+        name <- 
+            unlist(rd[unlist(lapply(rd, function(x) 
+                attr(x, "Rd_tag") == "\\name"))][[1]][1])
+        aliases <- unlist(lapply(rd[unlist(lapply(rd,
+            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
+        namesAndAliases <- c(name, aliases)
+        exportedTopics <- unique(namesAndAliases[namesAndAliases %in% exports])
+        if (length(exportedTopics) && 
+            !doesManPageHaveRunnableExample(rd)) 
+        {
+            msg <- sprintf(paste0("Man page %s documents exported\n", 
+                "  topic(s) %s\n  but has no runnable examples."),
+                basename(manpage), paste(exportedTopics, collapse=", "))
+            msgs <- append(msgs, msg)
+        }
+
+    }
+    if (length(msgs))
+    {
+        handleError("Man pages of exported objects had no running examples:")
+        for (msg in msgs)
+        {
+            handleMessage(msg)
+        }
+    }
+    msgs # for testing
+}

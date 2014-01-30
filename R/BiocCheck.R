@@ -85,6 +85,10 @@ BiocCheck <- function(package, ...)
 
     parsedCode <- parseFiles(package_dir)
 
+    ## FIXME - these should probably tell the user
+    ## which files (with line number?) the 'offending'
+    ## symbols were found in.
+
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
         "SYMBOL")
@@ -124,6 +128,9 @@ if (res > 0)
 
     handleMessage("Checking function lengths", appendLF=FALSE)
     checkFunctionLengths(parsedCode, package_name)
+
+    handleMessage("Checking exported objects have runnable examples...")
+    checkExportsAreDocumented(package_dir, package_name)
 
 
     ## Summary
