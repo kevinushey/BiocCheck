@@ -1,3 +1,4 @@
+Should we check for windows line endings?
 If Title in DESCRIPTION is short (or one word...), emit NOTE...after all this
 will be tweeted....
 
@@ -55,7 +56,7 @@ X- NAMESPACE and DESCRIPTION file consistency
     all 
 - devtools? codetoolsBioC?
     NOTE: writeNamespaceExports try/catch
-- NEWS file
+X- NEWS file
     missing?
     well-formatted?
     warning
@@ -131,7 +132,7 @@ getNamespaceImports("Rsamtools"))
 - [0/2] R/
    - [X] OS-specific packages / code ?
    - [X] Don't use T / F
-- [ ] NEWS
+- [X] NEWS
        - present in ./ or ./inst
        - well-formatted?
 - [X] registration of .Call entry points
