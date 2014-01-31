@@ -24,9 +24,13 @@ if ( (!alreadyExists) || (md5sum(tmpFile) != md5sum(destFile)))
     suppressWarnings(
         tryCatch({
                 res <- file.copy(tmpFile, destDir, overwrite<-TRUE)
-                res <- file.copy(batFile, destDir, overwrite<-TRUE)
-                if (!onWindows)
+
+                if (onWindows)
+                {
+                    res <- file.copy(batFile, destDir, overwrite<-TRUE)
+                } else {
                     res <- Sys.chmod(destFile, "0755")
+                }
                     },
             error=function(e) res=-1)
     )
