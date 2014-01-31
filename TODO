@@ -1,3 +1,4 @@
+fix install bug if R is not in path
 X- check for <<-
 
 More suggestions are going in the wiki:
