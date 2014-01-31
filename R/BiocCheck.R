@@ -132,6 +132,8 @@ if (res > 0)
     handleMessage("Checking exported objects have runnable examples...")
     checkExportsAreDocumented(package_dir, package_name)
 
+    handleMessage("Checking package NEWS...")
+    checkNEWS(package_dir)
 
     ## Summary
     .msg("\nSummary:")

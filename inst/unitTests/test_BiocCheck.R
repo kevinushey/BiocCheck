@@ -418,3 +418,19 @@ test_checkExportsAreDocumented <- function()
     res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
     checkEquals(1, BiocCheck:::.notes$getNum())
 }
+
+test_checkNEWS <- function()
+{
+    BiocCheck:::checkNEWS(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+    zeroCounters()
+    cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "NEWS"))
+    BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
+    stillZero()
+    unlink(file.path(UNIT_TEST_TEMPDIR, "NEWS"))
+    dir.create(file.path(UNIT_TEST_TEMPDIR, "inst"), FALSE)
+    cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "inst", "NEWS.Rd"))
+    BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
+    checkEquals(1, BiocCheck:::.warnings$getNum())
+}

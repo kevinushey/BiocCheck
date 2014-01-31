@@ -677,3 +677,28 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     }
     msgs # for testing
 }
+
+checkNEWS <- function(pkgdir)
+{
+    newsloc <- file.path(pkgdir, c("inst", "inst", "."), 
+            c("NEWS.Rd", "NEWS", "NEWS"))
+    news <- head(newsloc[file.exists(newsloc)], 1)
+    if (0L == length(news)) 
+    {
+        handleNote(paste0("No NEWS file. Package news will not be included\n",
+            "  in Bioconductor release announcements."))
+        return()
+    }
+    tryCatch({
+        suppressWarnings({
+            db <- if (grepl("Rd$", news)) 
+                tools:::.build_news_db_from_package_NEWS_Rd(news)
+            else tools:::.news_reader_default(news)
+        })
+    }, error=function(e){
+
+        handleWarning(sprintf(paste0("%s is malformed!\n",
+            "  Package news will not be included ",
+            "in Bioconductor release announcements."), basename(news)))
+    })
+}

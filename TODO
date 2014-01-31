@@ -1,4 +1,7 @@
-fix install bug if R is not in path
+If Title in DESCRIPTION is short (or one word...), emit NOTE...after all this
+will be tweeted....
+
+Xfix install bug if R is not in path
 X- check for <<-
 
 More suggestions are going in the wiki:
