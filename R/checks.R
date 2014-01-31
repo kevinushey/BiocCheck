@@ -42,9 +42,11 @@ checkVignetteDir <- function(pkgdir)
 
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
 
-    handleNote(sprintf(
+    handleMessage(sprintf(
         "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
         chunks, efs,  as.integer(percent)))
+    if (percent >= 50)
+        handleWarning("Too many vignette chunks are not evaluated!")
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -667,7 +669,7 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     }
     if (length(msgs))
     {
-        handleError("Man pages of exported objects had no running examples:")
+        handleNote("Man pages of exported objects had no running examples:")
         for (msg in msgs)
         {
             handleMessage(msg)
