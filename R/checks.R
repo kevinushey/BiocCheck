@@ -236,11 +236,12 @@ checkRegistrationOfEntryPoints <- function(pkgname)
     {
         r <- getDLLRegisteredRoutines(pkgname)
         # FIXME What's a better way to determine that there's nothing in r?
-        # This is stupid and may fail in other locales.
         x <- capture.output(r)
         if (length(x) == 1)
         {
-            handleWarning("Package has a DLL but no registered routines!")
+            handleWarning(
+                paste0("Package has a DLL but no registered routines!\n",
+                    "  see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
         }
     }
 }
