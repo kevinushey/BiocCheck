@@ -439,5 +439,5 @@ test_checkFormatting <- function()
 {
     BiocCheck:::checkFormatting(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(1, BiocCheck:::.notes$getNum())
+    checkEquals(3, BiocCheck:::.notes$getNum())
 }

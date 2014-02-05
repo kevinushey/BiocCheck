@@ -717,6 +717,10 @@ checkFormatting <- function(pkgdir)
         )
     longlines <- 0L
     totallines <- 0L
+    tablines <- 0L
+    badindentlines <- 0L
+    ok <- TRUE
+
     for (file in files)
     {
         if (file.exists(file))
@@ -732,11 +736,47 @@ checkFormatting <- function(pkgdir)
                 ## in which files. 
                 longlines <- longlines + length(long)
             }
+
+            tabs <- grepl("\t", lines)
+            if (any(tabs))
+            {
+                tablines <- tablines + length(which(tabs))
+            }
+
+            res <- regexpr("^([ ]+)", lines)
+            if (any(res > -1))
+            {
+                match.length <- attr(res, "match.length")
+                indents <- match.length[match.length > -1]
+                badindentlinesinthisfile <- length(which(indents %% 4 != 0))
+                badindentlines <- badindentlines + badindentlinesinthisfile
+            }
+
         }
     }
     if (longlines > 0)
     {
+        ok <- FALSE
         handleNote(sprintf(" %s lines (%i%%) are > 80 characters long!",
             longlines, as.integer((longlines/totallines) * (100/1) )))
+    }
+    if (tablines > 0)
+    {
+        ok <- FALSE
+        handleNote(sprintf(" %s lines (%i%%) contain tabs!",
+            tablines, as.integer((tablines/totallines) * (100/1) )))
+    }
+    if (badindentlines > 0)
+    {
+        ok <- FALSE
+        handleNote(sprintf(" %s lines (%i%%) are not indented by a multiple of 4 spaces!",
+            badindentlines,
+            as.integer((badindentlines/totallines) * (100/1) )))
+
+    }
+
+    if (!ok)
+    {
+        message("  See http://bioconductor.org/developers/how-to/coding-style/")
     }
 }
