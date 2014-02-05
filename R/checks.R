@@ -703,3 +703,40 @@ checkNEWS <- function(pkgdir)
             "in Bioconductor release announcements."), basename(news)))
     })
 }
+
+checkFormatting <- function(pkgdir)
+{
+    files <- c(file.path(pkgdir, c("DESCRIPTION",
+        "NAMESPACE")),
+        dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
+        full.names=TRUE),
+        dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
+            pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$", ignore.case=TRUE),
+        dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
+            full.names=TRUE)
+        )
+    longlines <- 0L
+    totallines <- 0L
+    for (file in files)
+    {
+        if (file.exists(file))
+        {
+            lines <- readLines(file, warn=FALSE)
+            totallines <- totallines + length(lines)
+            n <- nchar(lines)
+            names(n) <- seq_along(1:length(n))
+            long <- n[n > 80]
+            if (length(long))
+            {
+                ## TODO/FIXME We could tell the user here which lines are long
+                ## in which files. 
+                longlines <- longlines + length(long)
+            }
+        }
+    }
+    if (longlines > 0)
+    {
+        handleNote(sprintf(" %s lines (%i%%) are > 80 characters long!",
+            longlines, as.integer((longlines/totallines) * (100/1) )))
+    }
+}

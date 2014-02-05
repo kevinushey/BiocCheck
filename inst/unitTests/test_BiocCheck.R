@@ -434,3 +434,10 @@ test_checkNEWS <- function()
     BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
     checkEquals(1, BiocCheck:::.warnings$getNum())
 }
+
+test_checkFormatting <- function()
+{
+    BiocCheck:::checkFormatting(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+}
