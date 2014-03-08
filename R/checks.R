@@ -452,7 +452,6 @@ getBadDeps <- function(pkgdir)
 }
 
 
-## FIXME - turns out this is slow when run against
 getFunctionLengths <- function(df)
 {
     df <- df[df$terminal & df$parent > -1,]
