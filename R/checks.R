@@ -87,7 +87,9 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
 
     # temporarily disable this check on the single package builder
     # (until it's running on devel machines)
-    if (!nchar(Sys.getenv("PACKAGEBUILDER_HOME")))
+
+    if (package_version(BiocInstaller:::BIOC_VERSION)$minor %% 2 ==0 && 
+        !nchar(Sys.getenv("PACKAGEBUILDER_HOME")))
     {
         tryCatch({
             pv <- package_version(version)
