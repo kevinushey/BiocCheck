@@ -37,7 +37,7 @@ usage <- function()
     BiocCheck(file, opt)
 }
 
-BiocCheck <- function(package, ...)
+BiocCheck <- function(package = ".", ...)
 {
     loadRefClasses()
     package <- normalizePath(package)
